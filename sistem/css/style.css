@@ -1,0 +1,218 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&family=Quicksand:wght@500;700&display=swap');
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Halaman Login */
+.bg-auth img {
+    width: 114.4%;
+    height: auto;
+    display: block;
+    margin: -25px 0 -30px -125px;
+}   
+
+.login {
+    margin: 50px -50px 0 50px;
+}
+
+.card-body h3 {
+    color: #34455B;
+    margin: 30px 0 30px 0;
+}
+
+.card-body button {
+    background-color: #34455B;
+    color: #fff;
+    transition: background-color 0.3s ease;
+}
+
+.card-body button:hover {
+    background-color: #FFC045;
+}
+
+/* Navbar Halaman Utama */
+.navbar-nav .nav-link {
+    color: #34455B;
+    font-weight: bold;
+}
+
+.navbar-nav .nav-item.active .nav-link,
+.navbar-nav .nav-link:hover {
+    color: #FFC045;
+}
+
+/* Halaman Utama */
+.title {
+    color:#fff;
+    padding: 30px;
+}
+
+.big-text {
+    font-size: 80px;
+    font-weight: 700;
+}
+
+.content.title .btn-light {
+    color: #34455B;
+    padding: 5px 40px; 
+    margin: 10px 50px 60px 50px;
+}
+
+.content.title .btn-light:hover,
+.content.title .btn-light:focus {
+    background-color: #FFC045; 
+    color: white !important;
+}
+
+.container h1 {
+    color: #34455B; 
+    font-weight: bold; 
+    margin-top: 70px;
+}
+
+.garis-warna {
+    width: 15%;
+    border: 2px solid #FFC045;
+    margin: 0px;
+    margin-top: 70px;
+}
+
+.container-item {
+    margin: 40px 0 50px 0;
+}
+
+.container-item .col {
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.container-item .col:hover {
+    background-color: #FFC045;
+    color: #fff;
+}
+
+.container-item .col i {
+    display: block;
+    margin: 0 auto 20px;
+    font-size: 3em;
+    color: #FFC045;
+}
+
+.container-item .col h4 {
+    font-weight: bold;
+    color: #34455B;
+}
+
+.container-receipt {
+    position: relative;
+    top: 30px;
+}
+
+.receipt-bg {
+    background-color: #FFC045;
+    margin: 0 0 50px -7.5px;
+}
+
+.receipt-img {
+    background-color: #34455B;
+    margin: 0 0 50px -7.5px;
+}
+
+.receipt-text {
+    text-align: right;
+    margin: 120px 30px 30px 65px;
+    color: white;
+}
+
+.receipt-button {
+    text-align: right;
+    margin: 0 30px 50px 65px;
+}
+
+.receipt-button h6 {
+    color: #FFC045;
+}
+
+.receipt-button a:hover,
+.receipt-button h6:hover {
+    background-color: #34455B;
+    color: white;
+}
+
+.receipt-image {
+    width: 104.5%;
+    opacity: 0.5;
+    margin: 0 0 0 -12px;
+}
+
+.container-pesan .row .col {
+    background-color: #34455B;
+    color: #fff;
+    border: 2px solid #fff; 
+}
+
+.container-pesan .row h1 {
+    color:#fff;
+}
+
+/* Footer */
+.footer-container {
+    color: #fff;
+    background-color: #000000;
+}
+
+/* Toko Online */
+.navbar .sticky-bottom {
+    background-color: #fff;
+    padding: 10px 0;
+}
+
+.container-fluid {
+    text-align: center;
+    justify-content: center;
+}
+
+.container-fluid a {
+    text-decoration: none;
+    color: #34455B;
+    margin: 0 10px;
+    font-weight: bold;
+}
+
+.container-fluid a:hover {
+    color: #FFC045;
+}
+
+.row button {
+    background-color: #34455B;
+    color: #fff;
+    transition: background-color 0.3s ease;
+}
+
+.row button:hover {
+    background-color: #FFC045;
+}
+
+.custom-link {
+    text-decoration: none;
+    color: #FFC045;
+    transition: color 0.3s ease;
+}
+
+.custom-link:hover {
+    color: #34455B;
+}
+
+
+

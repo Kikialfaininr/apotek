@@ -1,0 +1,131 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&family=Poppins:wght@300;400;500;600;700;800&family=Quicksand:wght@500;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    appearance: none;
+    border: 0;
+    text-decoration: none;
+    list-style: none;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 14px;
+}
+
+body {
+    width: 100vw;
+    height: 100vw;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.88rem;
+}
+
+/* Navbar */
+.navbar a {
+    color: #34455B;
+    margin: 0px 20px 0 0;
+}
+
+.navbar-brand h4 {
+    margin: 0 0 0 20px;
+}
+
+.top_bar_content {
+    margin-left: auto;
+}
+
+/* Sidebar menu */
+.sidebar {
+    height: 100%;
+    width: 250px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #1D2B53;
+    padding-top: 20px;
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo h2 {
+    color: #fff;
+}
+
+.menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu li {
+    padding: 15px;
+    border-bottom: 1px solid #34495e;
+}
+
+.menu a {
+    text-decoration: none;
+    color: #ecf0f1;
+    display: flex;
+    align-items: center;
+}
+
+.menu i {
+    margin-right: 10px;
+}
+
+.submenu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: none;
+}
+
+.submenu:hover ul {
+    display: block;
+}
+
+.content {
+    margin-left: 250px;
+    padding: 20px;
+}
+
+/* dashboard */
+.dashboard {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.card-dashboard {
+    width: 24%;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-dashboard a {
+    color: white;
+    text-decoration: none;
+}
+
+.card-dashboard .card-body i {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-60%);
+    font-size: 60px;
+    color: rgba(255, 255, 255, 0.2); 
+}
+
+.chart {
+    width: 510px;
+    padding: 20px;
+    margin: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
+
+/* tabel data */
