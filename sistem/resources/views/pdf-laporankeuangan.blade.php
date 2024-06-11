@@ -19,7 +19,7 @@ td {
         </h5>
         <h4 class="text-center text-kop">CILACAP</h4>
         <hr><br>
-        <h3 class="text-center"><u>LAPORAN KEUANGAN</u></h3>
+        <h3 class="text-center"><u style="text-decoration: none; border-bottom: 2px solid black;">LAPORAN KEUANGAN</u></h3>
     </div>
 </div>
 <table id="kategori" class="table table-responsive table-bordered table-hover table-striped" style="width: 100%;">
@@ -44,7 +44,7 @@ td {
         @foreach($mergedDetail as $no => $detail)
         <tr>
             <td align="center">{{$no+1}}</td>
-            <td align="center">{{$detail->created_at}}</td>
+            <td align="center">{{$detail->updated_at}}</td>
             @if($detail instanceof App\Models\PenjualanDetail || $detail instanceof
             App\Models\PesananDetail)
             <td align="center">{{$detail->produk->nama}}</td>

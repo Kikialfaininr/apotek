@@ -2,6 +2,7 @@
 @extends('layouts.alert')
 
 @section('content')
+@if(auth()->check() && (auth()->user()->level == 'apoteker'))
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-12">
@@ -174,5 +175,9 @@ function hitungKembalian() {
     document.getElementById('kembalian').innerHTML = 'Rp ' + kembalian.toLocaleString('id-ID');
 }
 </script>
+
+@else
+<?php abort(403, 'Unauthorized action.'); ?>
+@endif
 
 @endsection

@@ -10,7 +10,7 @@
     <p style="margin: 0 50px;">
         Selalu siap melayani dan memberikan solusi terbaik untuk <br> segala kebutuhan kesehatan Anda.
     </p>
-    <a class="btn btn-light" href="#">
+    <a class="btn btn-light" href="{{ url('/toko-allproduk') }}">
         <h6><i class="fas fa-store"></i> Pesan</h6>
     </a>
 </div>
@@ -31,23 +31,23 @@
 
 <div class="container container-item">
     <div class="row">
-        <div class="col" onclick="window.location.href='#';">
+        <div class="col" onclick="window.location.href='{{ url('/toko-allproduk') }}';">
             <i class="fa fa-mortar-pestle fa-3x"></i>
             <h4>Obat Keras</h4>
             <p>Obat yang hanya boleh dibeli menggunakan resep dokter.</p>
         </div>
-        <div class="col" onclick="window.location.href='#';">
+        <div class="col" onclick="window.location.href='{{ url('/toko-obt') }}';">
             <i class="fa fa-tablets fa-3x"></i>
             <h4>Obat Bebas Terbatas</h4>
             <p>Obat yang dapat dibeli secara bebas tanpa menggunakan resep dokter, namun mempunyai peringatan khusus
                 saat menggunakannya.</p>
         </div>
-        <div class="col" onclick="window.location.href='#';">
+        <div class="col" onclick="window.location.href='{{ url('/toko-obatbebas') }}';">
             <i class="fa fa-pills fa-3x"></i>
             <h4>Obat Bebas</h4>
             <p>Obat yang bisa dibeli bebas di apotek, bahkan di warung, tanpa resep dokter.</p>
         </div>
-        <div class="col" onclick="window.location.href='#';">
+        <div class="col" onclick="window.location.href='{{ url('/toko-vitamin') }}';">
             <i class="fa fa-prescription-bottle fa-3x"></i>
             <h4>Vitamin</h4>
             <p> Nutrisi tambahan yang diperlukan bagi tubuh untuk bisa menunjang kinerja tubuh.</p>
@@ -68,7 +68,7 @@
             </div>
         </div>
         <div class="col thrid receipt-img">
-            <img src="sistem/img/apotek-online.jpg" class="receipt-image" />
+            <img src="{{ asset('sistem/img/apotek-online.jpg') }}" class="receipt-image" />
         </div>
     </div>
 </div>

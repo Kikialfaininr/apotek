@@ -2,8 +2,10 @@
 @extends('layouts.alert')
 
 @section('content')
+@if(auth()->check() && (auth()->user()->level == 'admin' || auth()->user()->level == 'owner'))
 <div class="card card-data col-md-12">
-    <h1 style="color: #34495e; margin: 30px 0 30px 0; font-weight: bold; text-align: center;">Pesanan Online Dibatalkan</h1>
+    <h1 style="color: #34495e; margin: 30px 0 30px 0; font-weight: bold; text-align: center;">Pesanan Online Dibatalkan
+    </h1>
     @if(isset($tanggal))
     <p style="color: #B4B4B8; text-align: center;">Tanggal: {{ $tanggal }}</p>
     @endif
@@ -32,11 +34,12 @@
         </div>
 
         <div class="table-responsive" style="width: 97%; margin-left: 15px;">
-            <table class="table table-responsive table-striped table-hover table-bordered">
+            <table id="example" class="table table-responsive table-striped table-hover table-bordered">
                 <thead>
                     <tr>
                         <th class="text-center">No</th>
                         <th class="text-center">Waktu</th>
+                        <th class="text-center">Username</th>
                         <th class="text-center">No Order</th>
                         <th class="text-center">Total</th>
                         <th class="text-center">Pengiriman</th>
@@ -48,16 +51,23 @@
                 <tbody>
                     @php $no = 0 @endphp
                     @foreach($pesanan as $value)
-                    @if ($value->status == 'Ditolak' || $value->status == 'Batal')
+                    @if ($value->status == 'Ditolak' || $value->status == 'Dibatalkan')
                     <tr>
                         <td align="center">{{ ++$no }}</td>
-                        <td align="center">{{ $value->created_at }}</td>
+                        <td align="center">{{ $value->updated_at }}</td>
+                        <td align="center">
+                            @if ($value->pelanggan)
+                            {{$value->pelanggan->name}}
+                            @else
+                            -
+                            @endif
+                        </td>
                         <td align="center">{{ $value->no_order }}</td>
                         <td align="center">Rp. {{ number_format($value->grand_total) }}</td>
                         <td align="center">{{ $value->metode_pengiriman }} </td>
                         <td align="center">{{ $value->metode_pembayaran }} </td>
                         <td align="center" style="@if ($value->status == 'Ditolak') background-color: red;
-                                                    @elseif ($value->status == 'Batal') background-color: darkred;
+                                                    @elseif ($value->status == 'Dibatalkan') background-color: darkred;
                                                     @endif; color: white;">{{ $value->status }}
                         </td>
                         <td align="center">
@@ -69,11 +79,6 @@
                     </tr>
                     @endif
                     @endforeach
-                    @if ($no == 0)
-                    <tr>
-                        <td colspan="12" align="center">Data tidak ditemukan</td>
-                    </tr>
-                    @endif
                 </tbody>
             </table>
         </div>
@@ -139,8 +144,8 @@
                             <td>{{ $kirim->alamat }} </td>
                         </tr>
                         <tr>
-                            <td colspan="2">Jarak</td>
-                            <td>{{ $kirim->jarak }} KM</td>
+                            <td colspan="2">Wilayah</td>
+                            <td>{{ $kirim->wilayah }}</td>
                         </tr>
                         <tr>
                             <td colspan="2">Ongkir</td>
@@ -197,10 +202,44 @@
                         @endforeach
                     </tbody>
                 </table>
+                @foreach($buktiPenerimaan as $no => $penerimaan)
+                @if($penerimaan->id_pesanan == $value->id_pesanan)
+                <table class="table table-responsive table-bordered">
+                    <tbody>
+                        <tr>
+                            <td colspan="3" style="background-color: #EEEEEE;">
+                                <strong>Bukti Penerimaan Pelanggan</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">Bukti Penerimaan</td>
+                            <td><a href="images/buktipenerimaan/{{$penerimaan->foto}}" target="_blank">
+                                    <img src="images/buktipenerimaan/{{$penerimaan->foto}}" width="100px"></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                @endif
+                @endforeach
             </div>
         </div>
     </div>
 </div>
 @endforeach
+
+@push('scripts')
+<script>
+    new DataTable('#example', {
+    responsive: true,
+    rowReorder: {
+        selector: 'td:nth-child(2)'
+    }
+});
+</script>
+@endpush
+
+@else
+<?php abort(403, 'Unauthorized action.'); ?>
+@endif
 
 @endsection

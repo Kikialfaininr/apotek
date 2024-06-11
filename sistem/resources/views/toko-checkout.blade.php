@@ -3,6 +3,7 @@
 @section('content')
 
 <div class="container">
+    @if(auth()->check() && (auth()->user()->level == 'pelanggan'))
     <div class="row justify-content-center">
         <div class="col-md-6">
             <a href="{{ url('/toko-allproduk') }}" style="text-decoration: none; color: #FFC045;"><i
@@ -10,7 +11,7 @@
         </div>
         <div class="col-md-6">
             <div class="d-flex justify-content-end">
-                <a href="{{ url('/') }}" style="text-decoration: none; color: #FFC045;">Lihat pesanan <i
+                <a href="{{ url('/pelanggan') }}" style="text-decoration: none; color: #FFC045;">Lihat pesanan <i
                         class="fa fa-arrow-right" aria-hidden="true"></i></a>
             </div>
         </div>
@@ -20,6 +21,7 @@
     <div class="row">
         <div class="container">
             <div class="row justify-content-center">
+                <!-- Bagian Kiri -->
                 <div class="col-md-5">
                     @if (session()->has('message'))
                     @php
@@ -42,6 +44,8 @@
                         <div clas="title" align="center">
                             <h5 style="color: #FFC045;"><strong>Pengambilan</strong></h5>
                             <p>Silahkan ambil obat pada <strong>Apotek Dua Farma</strong></p>
+                            <p style="font-style: italic; color: #E72929;">Obat tidak diambil lebih dari<strong> 2
+                                    hari</strong> otomatis pesanan akan dibatalkan</p>
                         </div>
                         <table class="table table-borderless">
                             <tbody>
@@ -74,7 +78,8 @@
                     <div class="card" style="padding: 20px;">
                         <div clas="title" align="center">
                             <h5 style="color: #FFC045;"><strong>Pengiriman</strong></h5>
-                            <p>Pengiriman hanya bisa dilakukan dengan jarak maksimal 15 KM</strong></p>
+                            <p>Pengiriman hanya bisa dilakukan pada daerah tertentu dalam wilayah kota Cilacap</strong>
+                            </p>
                         </div>
                         <form method="POST" action="{{ url('simpan-pengiriman') }}">
                             @csrf
@@ -82,19 +87,24 @@
                                 <tbody>
                                     <input type="hidden" name="id_pesanan" value="{{ $checkout->id_pesanan }}">
                                     <tr>
-                                        <td>Alamat</td>
+                                        <td>Alamat Lengkap</td>
                                         <td>:</td>
                                         <td colspan="2"><input type="text" id="alamat" class="form-control"
-                                                name="alamat" placeholder="Masukan alamat yang dituju untuk pengiriman">
-                                        </td>
+                                                name="alamat" placeholder="Masukkan alamat yang dituju untuk pengiriman"
+                                                required></td>
                                     </tr>
                                     <tr>
-                                        <td>Jarak</td>
+                                        <td>Wilayah</td>
                                         <td>:</td>
-                                        <td><input type="number" id="jarak" class="form-control" name="jarak"
-                                                placeholder="Masukan perkiraan jarak apotek dengan alamat yang dituju">
+                                        <td colspan="2">
+                                            <select class="form-select" name="id_ongkir" id="id_ongkir"
+                                                style="width: 100%; height: 35px; font-size: 13px;" required>
+                                                <option disabled selected value>Pilih Wilayah Desa</option>
+                                                @foreach ($wilayah as $data)
+                                                <option value="{{ $data->id_ongkir }}">{{ $data->wilayah }}</option>
+                                                @endforeach
+                                            </select>
                                         </td>
-                                        <td>KM</td>
                                     </tr>
                                     <tr>
                                         <td colspan="4" style="border:none;">
@@ -105,11 +115,12 @@
                                 </tbody>
                             </table>
                         </form>
+
                     </div>
                     @endif
                 </div>
 
-
+                <!-- Bagian Kanan -->
                 <div class="col-md-5">
                     @if (session()->has('message'))
                     @php
@@ -176,6 +187,8 @@
                         <div clas="title" align="center">
                             <h5 style="color: #FFC045;"><strong>Pembayaran QRIS</strong></h5>
                             <p>Silahkan scan kode QR dibawah ini untuk melakukan pembayaran online</p>
+                            <p style="font-style: italic; color: #E72929;">Pembayaran menggunakan QRIS tidak dapat
+                                dibatalkan</p>
                         </div>
                         @if($checkout->id_pesanan)
                         <table class="table table-borderless">
@@ -248,5 +261,6 @@
         </div>
     </div>
 </div>
+@endif
 
 @endsection

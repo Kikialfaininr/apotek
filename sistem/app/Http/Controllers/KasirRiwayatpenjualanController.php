@@ -21,12 +21,12 @@ class KasirRiwayatpenjualanController extends Controller
         $penjualanDetail = PenjualanDetail::query();
 
         if ($tanggal) {
-            $penjualan = $penjualan->whereDate('created_at', $tanggal);
-            $penjualanDetail = $penjualanDetail->whereDate('created_at', $tanggal);
+            $penjualan = $penjualan->whereDate('updated_at', $tanggal);
+            $penjualanDetail = $penjualanDetail->whereDate('updated_at', $tanggal);
         }
 
-        $penjualan = $penjualan->paginate(10);
-        $penjualanDetail = $penjualanDetail->paginate(10);
+        $penjualan = $penjualan->get();
+        $penjualanDetail = $penjualanDetail->get();
 
         return view('/kasir-riwayatpenjualan', compact('penjualan', 'penjualanDetail', 'tanggal'));
     }

@@ -32,7 +32,6 @@ body {
 }
 
 .card-body button {
-    background-color: #34455B;
     color: #fff;
     transition: background-color 0.3s ease;
 }
@@ -195,7 +194,6 @@ body {
 }
 
 .row button {
-    background-color: #34455B;
     color: #fff;
     transition: background-color 0.3s ease;
 }
@@ -213,6 +211,5 @@ body {
 .custom-link:hover {
     color: #34455B;
 }
-
 
 

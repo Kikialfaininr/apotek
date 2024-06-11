@@ -1,7 +1,7 @@
 @extends('layouts.app-kasir')
-@extends('layouts.alert')
 
 @section('content')
+@if(auth()->check() && (auth()->user()->level == 'apoteker'))
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-12">
@@ -22,36 +22,55 @@
         </div>
     </div>
 
-
     <div class="row justify-content-center mt-3">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
                     <nav>
                         <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                            <button class="nav-link active" id="masuk-tab" data-bs-toggle="tab" data-bs-target="#masuk"
-                                type="button" role="tab" aria-controls="masuk" aria-selected="true">Masuk</button>
+                            <button class="nav-link active" id="diproses-tab" data-bs-toggle="tab"
+                                data-bs-target="#diproses" type="button" role="tab" aria-controls="diproses"
+                                aria-selected="true">Diproses</button>
+                            <button class="nav-link" id="siap-tab" data-bs-toggle="tab" data-bs-target="#siap"
+                                type="button" role="tab" aria-controls="siap" aria-selected="true">Siap</button>
+                            <button class="nav-link" id="siap-tab" data-bs-toggle="tab" data-bs-target="#dikirim"
+                                type="button" role="tab" aria-controls="siap" aria-selected="true">Dikirim</button>
                             <button class="nav-link" id="selesai-tab" data-bs-toggle="tab" data-bs-target="#selesai"
                                 type="button" role="tab" aria-controls="selesai" aria-selected="false">Selesai</button>
                             <button class="nav-link" id="batal-tab" data-bs-toggle="tab" data-bs-target="#batal"
-                                type="button" role="tab" aria-controls="batal" aria-selected="false">Batal</button>
+                                type="button" role="tab" aria-controls="batal" aria-selected="false">Dibatalkan</button>
                         </div>
                     </nav>
+                    <div style="margin-top: 20px;">
+                        @if (session()->has('message'))
+                        @php
+                        $alertClass = session('alert_class', 'success');
+                        @endphp
 
+                        <div class="alert alert-{{ $alertClass }}">
+                            {{ session('message') }}
+                        </div>
+                        @endif
+
+                        @if (session()->has('error'))
+                        <div class="alert alert-danger">
+                            {{ session('error') }}
+                        </div>
+                        @endif
+                    </div>
                     <div class="tab-content" id="nav-tabContent">
-                        <div class="tab-pane fade show active" id="masuk" role="tabpanel" aria-labelledby="masuk-tab"
-                            tabindex="0">
+                        <div class="tab-pane fade show active" id="diproses" role="tabpanel"
+                            aria-labelledby="diproses-tab" tabindex="0">
                             <h3 style="color: #34495e; margin-top: 30px; font-weight: bold; text-align: center;">
-                                Pesanan Online Masuk</h3>
-                            @if(isset($tanggal))
-                            <p style="color: #B4B4B8; text-align: center;">Tanggal: {{ $tanggal }}</p>
-                            @endif
+                                Pesanan Diproses</h3>
                             <div class="table-responsive" style="margin-top: 20px;">
-                                <table class="table table-responsive table-striped table-hover table-bordered">
+                                <table id="example1"
+                                    class="table table-responsive table-striped table-hover table-bordered small">
                                     <thead>
                                         <tr>
                                             <th class="text-center">No</th>
                                             <th class="text-center">Waktu</th>
+                                            <th class="text-center">Username</th>
                                             <th class="text-center">No Order</th>
                                             <th class="text-center">Total</th>
                                             <th class="text-center">Pengiriman</th>
@@ -65,13 +84,20 @@
                                         $no = 0;
                                         @endphp
                                         @forelse($pesanan as $value)
-                                        @if(in_array($value->status, ['Siap', 'Dikirim']) || is_null($value->status))
+                                        @if(is_null($value->status))
                                         @php
                                         $no++;
                                         @endphp
                                         <tr>
                                             <td align="center">{{$no+1}}</td>
-                                            <td align="center">{{$value->created_at}}</td>
+                                            <td align="center">{{$value->updated_at}}</td>
+                                            <td align="center">
+                                                @if ($value->pelanggan)
+                                                {{$value->pelanggan->name}}
+                                                @else
+                                                -
+                                                @endif
+                                            </td>
                                             <td align="center">{{$value->no_order}}</td>
                                             <td align="center">Rp. {{ number_format($value->grand_total) }}</td>
                                             <td align="center">{{ $value->metode_pengiriman }} </td>
@@ -92,50 +118,166 @@
                                                 <button type="button" class="btn btn-primary btn-sm"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#detail{{$value->id_pesanan}}"
-                                                    title="Detail Pesanan">
+                                                    title="Detail Pesanan"
+                                                    style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
                                                     Detail
                                                 </button>
                                                 <a href="{{url($value->id_pesanan.'/invoice-pesananonline')}}"
                                                     target="_blank">
-                                                    <button class="btn btn-danger btn-sm">
+                                                    <button class="btn btn-danger btn-sm"  style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
                                                         <i class="fas fa-file-invoice"></i>
                                                     </button>
                                                 </a>
                                             </td>
                                         </tr>
                                         @endif
-                                        @empty
-                                        <tr>
-                                            <td colspan="12" align="center">Data tidak ditemukan</td>
-                                        </tr>
-                                        @endforelse
+                                        @endforeach
                                     </tbody>
                                 </table>
-                                <div class="d-flex justify-content-end">
-                                    <nav aria-label="Page navigation">
-                                        <ul class="pagination">
-                                            <li class="page-item {{ $pesanan->currentPage() == 1 ? 'disabled' : '' }}">
-                                                <a class="page-link" href="{{ $pesanan->previousPageUrl() }}"
-                                                    aria-label="Previous">
-                                                    <span aria-hidden="true">&laquo;</span>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="siap" role="tabpanel" aria-labelledby="siap-tab" tabindex="0">
+                            <h3 style="color: #34495e; margin-top: 30px; font-weight: bold; text-align: center;">
+                                Pesanan Siap</h3>
+                            <p style="color: #B4B4B8; text-align: center;">Pesanan siap diambil di Apotek Dua Farma</p>
+                            <div class="table-responsive">
+                                <table id="example2"
+                                    class="table table-responsive table-striped table-hover table-bordered small"
+                                    style="width: 100%;">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">No</th>
+                                            <th class="text-center">Waktu</th>
+                                            <th class="text-center">Username</th>
+                                            <th class="text-center">No Order</th>
+                                            <th class="text-center">Total</th>
+                                            <th class="text-center">Pengiriman</th>
+                                            <th class="text-center">Pembayaran</th>
+                                            <th class="text-center">Status</th>
+                                            <th class="text-center">Detail</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @php $no = 0 @endphp
+                                        @foreach($pesanan as $value)
+                                        @if ($value->status == 'Siap')
+                                        @php
+                                        // Hitung selisih hari
+                                        $createdDate = \Carbon\Carbon::parse($value->updated_at);
+                                        $now = \Carbon\Carbon::now();
+                                        $differenceInDays = $createdDate->diffInDays($now);
+                                        @endphp
+                                        <tr>
+                                            <td align="center">{{ ++$no }}</td>
+                                            <td align="center">{{ $value->updated_at }}</td>
+                                            <td align="center">
+                                                @if ($value->pelanggan)
+                                                {{$value->pelanggan->name}}
+                                                @else
+                                                -
+                                                @endif
+                                            </td>
+                                            <td align="center">{{ $value->no_order }}</td>
+                                            <td align="center">Rp. {{ number_format($value->grand_total) }}</td>
+                                            <td align="center">{{ $value->metode_pengiriman }} </td>
+                                            <td align="center">{{ $value->metode_pembayaran }} </td>
+                                            <td align="center"
+                                                style="max-width: 150px; @if ($value->metode_pengiriman == 'Diambil' && $differenceInDays > 2) background-color: #E72929; color: white; @else background-color: blue; color: white; @endif">
+                                                {{ $value->status }}
+                                                @if ($value->metode_pengiriman == 'Diambil' && $differenceInDays > 2)
+                                                <hr>
+                                                <p style="font-style: italic; font-size: smaller;">Pesanan tidak diambil
+                                                    dalam 2 hari, batalkan!</p>
+                                                @endif
+                                            </td>
+                                            <td align="center">
+                                                <button type="button" class="btn btn-primary btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#detail{{$value->id_pesanan}}"
+                                                    title="Detail Pesanan"
+                                                    style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
+                                                    Detail
+                                                </button>
+                                                <a href="{{url($value->id_pesanan.'/invoice-pesananonline')}}"
+                                                    target="_blank">
+                                                    <button class="btn btn-danger btn-sm" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
+                                                        <i class="fas fa-file-invoice"></i>
+                                                    </button>
                                                 </a>
-                                            </li>
-                                            @for ($i = 1; $i <= $pesanan->lastPage(); $i++)
-                                                <li
-                                                    class="page-item {{ $pesanan->currentPage() == $i ? 'active' : '' }}">
-                                                    <a class="page-link" href="{{ $pesanan->url($i) }}">{{ $i }}</a>
-                                                </li>
-                                                @endfor
-                                                <li
-                                                    class="page-item {{ $pesanan->currentPage() == $pesanan->lastPage() ? 'disabled' : '' }}">
-                                                    <a class="page-link" href="{{ $pesanan->nextPageUrl() }}"
-                                                        aria-label="Next">
-                                                        <span aria-hidden="true">&raquo;</span>
-                                                    </a>
-                                                </li>
-                                        </ul>
-                                    </nav>
-                                </div>
+                                            </td>
+                                        </tr>
+                                        @endif
+                                        @endforeach
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="dikirim" role="tabpanel" aria-labelledby="dikirim-tab"
+                            tabindex="0">
+                            <h3 style="color: #34495e; margin-top: 30px; font-weight: bold; text-align: center;">
+                                Pesanan Dikirim</h3>
+                            <p style="color: #B4B4B8; text-align: center;">Pesanan anda sedang dikirim, silahkan tunggu!
+                            </p>
+                            <div class="table-responsive">
+                                <table id="example3"
+                                    class="table table-responsive table-striped table-hover table-bordered small"
+                                    style="width: 100%;">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">No</th>
+                                            <th class="text-center">Waktu</th>
+                                            <th class="text-center">Username</th>
+                                            <th class="text-center">No Order</th>
+                                            <th class="text-center">Total</th>
+                                            <th class="text-center">Pengiriman</th>
+                                            <th class="text-center">Pembayaran</th>
+                                            <th class="text-center">Status</th>
+                                            <th class="text-center">Detail</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @php $no = 0 @endphp
+                                        @foreach($pesanan as $value)
+                                        @if ($value->status == 'Dikirim')
+                                        <tr>
+                                            <td align="center">{{ ++$no }}</td>
+                                            <td align="center">{{ $value->updated_at }}</td>
+                                            <td align="center">
+                                                @if ($value->pelanggan)
+                                                {{$value->pelanggan->name}}
+                                                @else
+                                                -
+                                                @endif
+                                            </td>
+                                            <td align="center">{{ $value->no_order }}</td>
+                                            <td align="center">Rp. {{ number_format($value->grand_total) }}</td>
+                                            <td align="center">{{ $value->metode_pengiriman }} </td>
+                                            <td align="center">{{ $value->metode_pembayaran }} </td>
+                                            <td align="center" style="background-color: gray; color: white;">
+                                                {{ $value->status }}</td>
+                                            <td align="center">
+                                                <button type="button" class="btn btn-primary btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#detail{{$value->id_pesanan}}"
+                                                    title="Detail Pesanan"
+                                                    style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
+                                                    Detail
+                                                </button>
+                                                <a href="{{url($value->id_pesanan.'/invoice-pesananonline')}}"
+                                                    target="_blank">
+                                                    <button class="btn btn-danger btn-sm" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
+                                                        <i class="fas fa-file-invoice"></i>
+                                                    </button>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        @endif
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
 
@@ -143,27 +285,15 @@
                             tabindex="0">
                             <h3 style="color: #34495e; margin-top: 30px; font-weight: bold; text-align: center;">
                                 Pesanan Online Selesai</h3>
-                            @if(isset($tanggal))
-                            <p style="color: #B4B4B8; text-align: center;">Tanggal: {{ $tanggal }}</p>
-                            @endif
-                            <div class="col-md-8" style="margin: 20px 0 10px 0;">
-                                <a href="{{url('download-pesananonline')}}" target="_blank">
-                                    <button class="btn btn-danger">
-                                        <i class='fas fa-file-pdf'></i> Cetak Pesanan Online
-                                    </button>
-                                </a>
-                                <a href="{{url('download-detailonline')}}" target="_blank">
-                                    <button class="btn btn-danger">
-                                        <i class='fas fa-file-pdf'></i> Cetak Produk Online Terjual
-                                    </button>
-                                </a>
-                            </div>
                             <div class="table-responsive">
-                                <table class="table table-responsive table-striped table-hover table-bordered">
+                                <table id="example4"
+                                    class="table table-responsive table-striped table-hover table-bordered small"
+                                    style="width: 100%;">
                                     <thead>
                                         <tr>
                                             <th class="text-center">No</th>
                                             <th class="text-center">Waktu</th>
+                                            <th class="text-center">Username</th>
                                             <th class="text-center">No Order</th>
                                             <th class="text-center">Total</th>
                                             <th class="text-center">Pengiriman</th>
@@ -178,7 +308,14 @@
                                         @if ($value->status == 'Selesai')
                                         <tr>
                                             <td align="center">{{ ++$no }}</td>
-                                            <td align="center">{{ $value->created_at }}</td>
+                                            <td align="center">{{ $value->updated_at }}</td>
+                                            <td align="center">
+                                                @if ($value->pelanggan)
+                                                {{$value->pelanggan->name}}
+                                                @else
+                                                -
+                                                @endif
+                                            </td>
                                             <td align="center">{{ $value->no_order }}</td>
                                             <td align="center">Rp. {{ number_format($value->grand_total) }}</td>
                                             <td align="center">{{ $value->metode_pengiriman }} </td>
@@ -189,12 +326,13 @@
                                                 <button type="button" class="btn btn-primary btn-sm"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#detail{{$value->id_pesanan}}"
-                                                    title="Detail Pesanan">
+                                                    title="Detail Pesanan"
+                                                    style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
                                                     Detail
                                                 </button>
                                                 <a href="{{url($value->id_pesanan.'/invoice-pesananonline')}}"
                                                     target="_blank">
-                                                    <button class="btn btn-danger btn-sm">
+                                                    <button class="btn btn-danger btn-sm" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
                                                         <i class="fas fa-file-invoice"></i>
                                                     </button>
                                                 </a>
@@ -202,11 +340,6 @@
                                         </tr>
                                         @endif
                                         @endforeach
-                                        @if ($no == 0)
-                                        <tr>
-                                            <td colspan="12" align="center">Data tidak ditemukan</td>
-                                        </tr>
-                                        @endif
                                     </tbody>
                                 </table>
                             </div>
@@ -214,16 +347,19 @@
 
                         <div class="tab-pane fade" id="batal" role="tabpanel" aria-labelledby="batal-tab" tabindex="0">
                             <h3 style="color: #34495e; margin-top: 30px; font-weight: bold; text-align: center;">
-                                Pesanan Online Batal</h3>
+                                Pesanan Dibatalkan</h3>
                             @if(isset($tanggal))
                             <p style="color: #B4B4B8; text-align: center;">Tanggal: {{ $tanggal }}</p>
                             @endif
                             <div class="table-responsive" style="margin-top: 20px;">
-                                <table class="table table-responsive table-striped table-hover table-bordered">
+                                <table id="example5"
+                                    class="table table-responsive table-striped table-hover table-bordered small"
+                                    style="width: 100%;">
                                     <thead>
                                         <tr>
                                             <th class="text-center">No</th>
                                             <th class="text-center">Waktu</th>
+                                            <th class="text-center">Username</th>
                                             <th class="text-center">No Order</th>
                                             <th class="text-center">Total</th>
                                             <th class="text-center">Pengiriman</th>
@@ -235,16 +371,23 @@
                                     <tbody>
                                         @php $no = 0 @endphp
                                         @foreach($pesanan as $value)
-                                        @if ($value->status == 'Ditolak' || $value->status == 'Batal')
+                                        @if ($value->status == 'Ditolak' || $value->status == 'Dibatalkan')
                                         <tr>
                                             <td align="center">{{ ++$no }}</td>
-                                            <td align="center">{{ $value->created_at }}</td>
+                                            <td align="center">{{ $value->updated_at }}</td>
+                                            <td align="center">
+                                                @if ($value->pelanggan)
+                                                {{$value->pelanggan->name}}
+                                                @else
+                                                -
+                                                @endif
+                                            </td>
                                             <td align="center">{{ $value->no_order }}</td>
                                             <td align="center">Rp. {{ number_format($value->grand_total) }}</td>
                                             <td align="center">{{ $value->metode_pengiriman }} </td>
                                             <td align="center">{{ $value->metode_pembayaran }} </td>
                                             <td align="center" style="@if ($value->status == 'Ditolak') background-color: red;
-                                                    @elseif ($value->status == 'Batal') background-color: darkred;
+                                                    @elseif ($value->status == 'Dibatalkan') background-color: darkred;
                                                     @endif; color: white;">{{ $value->status }}
                                             </td>
                                             <td align="center">
@@ -258,11 +401,6 @@
                                         </tr>
                                         @endif
                                         @endforeach
-                                        @if ($no == 0)
-                                        <tr>
-                                            <td colspan="12" align="center">Data tidak ditemukan</td>
-                                        </tr>
-                                        @endif
                                     </tbody>
                                 </table>
                             </div>
@@ -333,8 +471,8 @@
                             <td>{{ $kirim->alamat }} </td>
                         </tr>
                         <tr>
-                            <td colspan="2">Jarak</td>
-                            <td>{{ $kirim->jarak }} KM</td>
+                            <td colspan="2">Wilayah</td>
+                            <td>{{ $kirim->wilayah }}</td>
                         </tr>
                         <tr>
                             <td colspan="2">Ongkir</td>
@@ -363,15 +501,23 @@
                             <td>
                                 @if ($bukti->konfirmasi == 'Terkonfirmasi')
                                 <strong><i class="fa fa-check"></i> Terkonfirmasi</strong>
+                                @elseif ($bukti->konfirmasi == 'Ditolak')
+                                <strong><i class="fa fa-times"></i> Bukti Ditolak</strong>
                                 @else
-                                <form action="{{ url('konfirmasi-pembayaran') }}" method="POST">
+                                <form action="{{ url('konfirmasi-pembayaran') }}" method="POST" style="display:inline;">
                                     @csrf
                                     <input type="hidden" name="bukti_pembayaran_id" value="{{ $bukti->id_bukti }}">
+                                    <input type="hidden" name="status" value="Terkonfirmasi">
                                     <button type="submit" class="btn btn-warning">Konfirmasi Pembayaran</button>
+                                </form>
+                                <form action="{{ url('konfirmasi-pembayaran') }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    <input type="hidden" name="bukti_pembayaran_id" value="{{ $bukti->id_bukti }}">
+                                    <input type="hidden" name="status" value="Ditolak">
+                                    <button type="submit" class="btn btn-danger">Tolak Bukti</button>
                                 </form>
                                 @endif
                             </td>
-
                         </tr>
                         @endif
                         @endforeach
@@ -391,7 +537,109 @@
                         @endforeach
                     </tbody>
                 </table>
-                @if(in_array($value->status, ['Siap', 'Dikirim']) || is_null($value->status))
+                @foreach($buktiPenerimaan as $no => $penerimaan)
+                @if($penerimaan->id_pesanan == $value->id_pesanan)
+                <table class="table table-responsive table-bordered">
+                    <tbody>
+                        <tr>
+                            <td colspan="3" style="background-color: #EEEEEE;">
+                                <strong>Bukti Penerimaan Pelanggan</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">Bukti Penerimaan</td>
+                            <td><a href="images/buktipenerimaan/{{$penerimaan->foto}}" target="_blank">
+                                    <img src="images/buktipenerimaan/{{$penerimaan->foto}}" width="100px"></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                @endif
+                @endforeach
+
+                <!-- Jika pesanan belum diproses dan QRIS (Harus konfirmasi pembayaran dahulu) -->
+                @if(is_null($value->status) && $value->metode_pembayaran == "QRIS")
+                <div class="modal-footer">
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <table class="table table-responsive table-borderless">
+                                @php $bukti_pembayaran_ada = false; @endphp
+                                @foreach($buktiPembayaran as $no => $bukti)
+                                @if($bukti->id_pesanan == $value->id_pesanan)
+                                @php $bukti_pembayaran_ada = true; @endphp
+                                <tbody>
+                                    @if ($bukti->konfirmasi == 'Terkonfirmasi')
+                                    <tr>
+                                        <td>
+                                            <form action="{{ url('update-status') }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="pesanan_id" value="{{ $value->id_pesanan }}">
+                                                <input type="hidden" name="status" value="Ditolak">
+                                                <button type="submit" class="btn btn-danger">Tolak</button>
+                                            </form>
+                                        </td>
+                                        <td>
+                                            <form action="{{ url('update-status') }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="pesanan_id" value="{{ $value->id_pesanan }}">
+                                                <input type="hidden" name="status" value="Siap">
+                                                <button type="submit" class="btn btn-primary">Siap</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    @elseif ($bukti->konfirmasi == 'Ditolak')
+                                    <tr>
+                                        <td colspan="2">
+                                            <p style="font-style: italic; color: #E72929;">Bukti pembayaran ditolak,
+                                                lakukan penolakan pesanan online segera!</p>
+                                        </td>
+                                        <td>
+                                            <form action="{{ url('update-status') }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="pesanan_id" value="{{ $value->id_pesanan }}">
+                                                <input type="hidden" name="status" value="Ditolak">
+                                                <button type="submit" class="btn btn-danger">Tolak</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    @else
+                                    <tr>
+                                        <td colspan="2">
+                                            <p style="font-style: italic; color: #E72929;">Lakukan konfirmasi bukti
+                                                pembayaran dahulu sebelum memproses pesanan
+                                                online!</p>
+                                        </td>
+                                    </tr>
+                                    @endif
+                                </tbody>
+                                @endif
+                                @endforeach
+                                @if (!$bukti_pembayaran_ada)
+                                <tbody>
+                                    <tr>
+                                        <td colspan="2">
+                                            <p style="font-style: italic; color: #E72929;">Pelanggan tidak menyertakan
+                                                bukti pembayaran,
+                                                tolak pesanan!</p>
+                                        </td>
+                                        <td>
+                                            <form action="{{ url('update-status') }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="pesanan_id" value="{{ $value->id_pesanan }}">
+                                                <input type="hidden" name="status" value="Ditolak">
+                                                <button type="submit" class="btn btn-danger">Tolak</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                @endif
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Jika pesanan belum diproses dan tunai (tolak atau siap) -->
+                @elseif(is_null($value->status) && $value->metode_pembayaran == "Tunai")
                 <div class="modal-footer">
                     <div class="form-group row">
                         <div class="col-md-12">
@@ -413,32 +661,194 @@
                                             <button type="submit" class="btn btn-primary">Siap</button>
                                         </form>
                                     </td>
-                                    <td>
-                                        <form action="{{ url('update-status') }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="pesanan_id" value="{{ $value->id_pesanan }}">
-                                            <input type="hidden" name="status" value="Dikirim">
-                                            <button type="submit" class="btn btn-secondary">Dikirim</button>
-                                        </form>
-                                    </td>
-                                    <td>
-                                        <form action="{{ url('update-status') }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="pesanan_id" value="{{ $value->id_pesanan }}">
-                                            <input type="hidden" name="status" value="Selesai">
-                                            <button type="submit" class="btn btn-success">Selesai</button>
-                                        </form>
-                                    </td>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
+                <!-- Jika pesanan siap dan dikirim (dikirim)-->
+                @elseif($value->status == "Siap" && $value->metode_pengiriman == "Dikirim")
+                <div class="modal-footer">
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <form action="{{ url('update-status') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="pesanan_id" value="{{ $value->id_pesanan }}">
+                                <input type="hidden" name="status" value="Dikirim">
+                                <button type="submit" class="btn btn-secondary">Dikirim</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- Jika pesanan siap dan diambil (jika lebih dari 2 hari maka pesanan dibatalkan) -->
+                @elseif($value->status == "Siap" && $value->metode_pengiriman == "Diambil")
+                @php
+                $createdDate = \Carbon\Carbon::parse($value->updated_at);
+                $now = \Carbon\Carbon::now();
+                $differenceInDays = $createdDate->diffInDays($now);
+                @endphp
+                @if ($differenceInDays > 2)
+                <div class="modal-footer">
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <form action="{{ url('update-status') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="pesanan_id" value="{{ $value->id_pesanan }}">
+                                <input type="hidden" name="status" value="Ditolak">
+                                <button type="submit" class="btn btn-danger">Tolak</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                @else
+                <div class="modal-footer">
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <form action="{{ url('update-status') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="pesanan_id" value="{{ $value->id_pesanan }}">
+                                <input type="hidden" name="status" value="Selesai">
+                                <button type="submit" class="btn btn-success">Selesai</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                @endif
+                @elseif($value->status == "Dikirim")
+                @php
+                $adaBuktiPenerimaan = false;
+                @endphp
+                @foreach($buktiPenerimaan as $no => $penerimaan)
+                @if($penerimaan->id_pesanan == $value->id_pesanan)
+                @php
+                $adaBuktiPenerimaan = true;
+                @endphp
+                <table class="table table-responsive table-bordered">
+                    <tbody>
+                        <tr>
+                            <td colspan="3" style="background-color: #EEEEEE; font-style: italic; color: #E72929;">
+                                <strong>Jika pelanggan tidak konfirmasi penerimaan selama 3 hari, selesaikan pesanan
+                                    dengan upload bukti penerimaan!</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">Bukti Penerimaan</td>
+                            <td><a href="images/buktipenerimaan/{{$penerimaan->foto}}" target="_blank">
+                                    <img src="images/buktipenerimaan/{{$penerimaan->foto}}" width="100px"></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="modal-footer">
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <form action="{{ url('update-status') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="pesanan_id" value="{{ $value->id_pesanan }}">
+                                <input type="hidden" name="status" value="Selesai">
+                                <button type="submit" class="btn btn-success">Selesai</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                @endif
+                @endforeach
+
+                @php
+                $created_at = \Carbon\Carbon::parse($value->created_at);
+                $now = \Carbon\Carbon::now();
+                $diffInDays = $created_at->diffInDays($now);
+                @endphp
+
+                @if(!$adaBuktiPenerimaan)
+                <table class="table table-responsive table-bordered">
+                    <tbody>
+                        <tr>
+                            <td colspan="3" style="background-color: #EEEEEE; font-style: italic; color: #E72929;">
+                                <strong>Jika pelanggan tidak konfirmasi penerimaan selama 3 hari, selesaikan pesanan
+                                    dengan upload bukti penerimaan!</strong>
+                            </td>
+                        </tr>
+                        <form method="POST" action="{{ url('simpan-penerimaan') }}" enctype="multipart/form-data">
+                            @csrf
+                            <input type="hidden" name="id_pesanan" value="{{ $value->id_pesanan }}">
+                            <tr>
+                                <td colspan="2">Upload Bukti Penerimaan</td>
+                                <td>
+                                    <input id="foto" type="file" name="foto" required autofocus
+                                        {{ $diffInDays < 3 ? 'disabled' : '' }}> <br><br>
+                                    <button type="submit" class="btn btn-success btn-sm float-right"
+                                        style="width: 100%;" {{ $diffInDays < 3 ? 'disabled' : '' }}>Simpan</button>
+                                </td>
+                            </tr>
+                        </form>
+                    </tbody>
+                </table>
+                <div class="modal-footer">
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <form action="{{ url('update-status') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="pesanan_id" value="{{ $value->id_pesanan }}">
+                                <input type="hidden" name="status" value="Selesai">
+                                <button type="submit" class="btn btn-success" disabled>Selesai</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                @endif
                 @endif
             </div>
         </div>
     </div>
 </div>
 @endforeach
+
+@push('scripts')
+<script>
+new DataTable('#example1', {
+    responsive: true,
+    rowReorder: {
+        selector: 'td:nth-child(2)'
+    }
+});
+</script>
+<script>
+new DataTable('#example2', {
+    responsive: true,
+    rowReorder: {
+        selector: 'td:nth-child(2)'
+    }
+});
+</script>
+<script>
+new DataTable('#example3', {
+    responsive: true,
+    rowReorder: {
+        selector: 'td:nth-child(2)'
+    }
+});
+</script>
+<script>
+new DataTable('#example4', {
+    responsive: true,
+    rowReorder: {
+        selector: 'td:nth-child(2)'
+    }
+});
+</script>
+<script>
+new DataTable('#example5', {
+    responsive: true,
+    rowReorder: {
+        selector: 'td:nth-child(2)'
+    }
+});
+</script>
+@endpush
+
+@else
+<?php abort(403, 'Unauthorized action.'); ?>
+@endif
 
 @endsection

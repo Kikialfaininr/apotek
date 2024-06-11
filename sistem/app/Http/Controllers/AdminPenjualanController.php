@@ -10,7 +10,7 @@ use App\Models\Produk;
 use Redirect;
 use Session;
 use PDF;
-use Image;
+use Image; 
 
 class AdminPenjualanController extends Controller
 {
@@ -21,15 +21,16 @@ class AdminPenjualanController extends Controller
         $penjualanDetail = PenjualanDetail::query();
 
         if ($tanggal) {
-            $penjualan = $penjualan->whereDate('created_at', $tanggal);
-            $penjualanDetail = $penjualanDetail->whereDate('created_at', $tanggal);
+            $penjualan = $penjualan->whereDate('updated_at', $tanggal);
+            $penjualanDetail = $penjualanDetail->whereDate('updated_at', $tanggal);
         }
 
-        $penjualan = $penjualan->paginate(10);
-        $penjualanDetail = $penjualanDetail->paginate(10);
+        $penjualan = $penjualan->get();
+        $penjualanDetail = $penjualanDetail->get();
 
-        return view('/admin-penjualan', compact('penjualan', 'penjualanDetail', 'tanggal'));
+        return view('admin-penjualan', compact('penjualan', 'penjualanDetail', 'tanggal'));
     }
+
 
     public function downloadinvoice()
     {

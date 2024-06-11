@@ -38,7 +38,7 @@ td {
         @foreach($pesananDetail as $no => $value)
         <tr>
             <td align="center">{{$no+1}}</td>
-            <td align="center">{{$value->created_at}}</td>
+            <td align="center">{{$value->updated_at}}</td>
             <td align="center">{{$value->pesanan->no_order}}</td>
             <td align="center">{{$value->produk->nama}}</td>
             <td align="center">Rp. {{ number_format($value->produk->harga_jual) }}</td>

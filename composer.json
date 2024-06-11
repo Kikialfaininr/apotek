@@ -1,0 +1,6 @@
+{
+    "require": {
+        "yajra/laravel-datatables-oracle": "10.0",
+        "barryvdh/laravel-dompdf": "^2.2"
+    }
+}

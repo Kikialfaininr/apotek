@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Produk;
 use App\Models\Kategori;
 use App\Models\PenjualanDetail;
+use App\Models\PesananDetail;
 use App\Models\Kasir;
 use Redirect;
 use Session;
@@ -15,28 +16,13 @@ use Image;
 
 class AdminProdukController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
         $kategori = Kategori::all();
-        $query = Produk::query();
-
-        if ($request->has('search')) {
-            $searchTerm = $request->search;
-            $query->where(function($q) use ($searchTerm) {
-                $q->where('nama', 'LIKE', '%' . $searchTerm . '%')
-                ->orWhere('bentuk_sediaan', 'LIKE', '%' . $searchTerm . '%')
-                ->orWhere('satuan', 'LIKE', '%' . $searchTerm . '%')
-                ->orWhereHas('kategori', function ($q) use ($searchTerm) {
-                        $q->where('nama_kategori', 'LIKE', '%' . $searchTerm . '%');
-                });
-            });
-        }
-
-        $produk = $query->with('kategori')->orderBy('created_at', 'DESC')->paginate(10);
+        $produk = Produk::with('kategori')->orderBy('updated_at', 'DESC')->get();
         
-        return view('admin-produk', compact('produk', 'kategori', 'request'));
+        return view('admin-produk', compact('produk', 'kategori'));
     }
-
 
     public function tambah()
     {
@@ -59,8 +45,10 @@ class AdminProdukController extends Controller
         ]);
     
         if ($validator->fails()) {
-            $request->session()->flash('gagal', $validator->errors()->first());
-            return Redirect::back()->withInput();
+            return redirect('/admin-produk')->with([
+                'message' => $validator->errors()->first(),
+                'alert_class' => 'danger'
+            ]);
         }
 
         $file = $request->file('foto');
@@ -81,8 +69,7 @@ class AdminProdukController extends Controller
             $produk->harga_jual = $request->harga_jual;
             $produk->id_kategori = $request->id_kategori;
         $produk->save();
-        Session::flash('sukses','Data berhasil ditambah');
-        return Redirect('/admin-produk');      
+        return redirect('/admin-produk')->with('message', 'Data berhasil ditambah')->with('alert_class', 'success');      
     }
 
     public function edit(Request $request, $id)
@@ -103,8 +90,10 @@ class AdminProdukController extends Controller
         ]);
     
         if ($validator->fails()) {
-            $request->session()->flash('gagal', $validator->errors()->first());
-            return Redirect::back()->withInput();
+            return redirect('/admin-produk')->with([
+                'message' => $validator->errors()->first(),
+                'alert_class' => 'danger'
+            ]);
         }
 
         $file = $request->file('foto');
@@ -125,8 +114,7 @@ class AdminProdukController extends Controller
             $produk->harga_jual = $request->harga_jual;
             $produk->id_kategori = $request->id_kategori;
         $produk->save();
-        Session::flash('sukses', 'Data berhasil diubah');
-        return Redirect('/admin-produk');
+        return redirect('/admin-produk')->with('message', 'Data berhasil diubah')->with('alert_class', 'success');
     }
 
     public function hapus(Request $request, $id)
@@ -134,15 +122,14 @@ class AdminProdukController extends Controller
         $produk = Produk::findOrFail($id);
         $kasirCount = $produk->kasir()->count();
         $penjualanDetailCount = $produk->penjualandetail()->count();
+        $pesananDetailCount = $produk->pesanandetail()->count();
 
-        if ($kasirCount > 0 || $penjualanDetailCount > 0) {
-            Session::flash('gagal', 'Data tidak dapat dihapus karena masih terdapat transaksi yang terkait.');
-            return redirect('/admin-produk');
+        if ($kasirCount > 0 || $penjualanDetailCount > 0 || $pesananDetailCount > 0) {
+            return redirect('/admin-produk')->with('error', 'Data tidak dapat dihapus karena masih terdapat transaksi yang terkait.');
         }
 
         $produk->delete();
-        Session::flash('sukses','Data berhasil dihapus');
-        return redirect('/admin-produk');
+        return redirect('/admin-produk')->with('message', 'Data berhasil dihapus')->with('alert_class', 'success');
     }
 
     public function downloadpdf()

@@ -31,7 +31,7 @@ td {
             <th class="text-center">Total</th>
             <th class="text-center">Pengiriman</th>
             <th class="text-center">Alamat</th>
-            <th class="text-center">Jarak</th>
+            <th class="text-center">Wilayah</th>
             <th class="text-center">Ongkir</th>
             <th class="text-center">Pembayaran</th>
             <th class="text-center">Total Bayar</th>
@@ -44,14 +44,14 @@ td {
         @if ($value->status == 'Selesai')
         <tr>
             <td align="center">{{ ++$no }}</td>
-            <td align="center">{{ $value->created_at }}</td>
+            <td align="center">{{ $value->updated_at }}</td>
             <td align="center">{{ $value->no_order }}</td>
             <td align="center">Rp. {{ number_format($value->grand_total) }}</td>
             <td align="center">{{ $value->metode_pengiriman }} </td>
             @foreach($pengiriman as $no => $kirim)
             @if($kirim->id_pesanan == $value->id_pesanan)
             <td align="center">{{ optional($kirim)->alamat ?? '-' }}</td>
-            <td align="center">{{ optional($kirim)->jarak ?? '-' }}</td>
+            <td align="center">{{ optional($kirim)->wilayah ?? '-' }}</td>
             <td align="center">Rp {{ number_format(optional($kirim)->ongkir ?? '-') }}</td>
             <td align="center">{{ $value->metode_pembayaran }}</td>
             <td align="center">Rp {{ number_format($kirim->ongkir + $value->grand_total) }}</td>

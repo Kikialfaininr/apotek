@@ -55,7 +55,7 @@ class KasirController extends Controller
 
         return Redirect('/kasir'); 
     }
-
+ 
 
     public function changeQuantity(Request $request)
     {
@@ -144,7 +144,7 @@ class KasirController extends Controller
                 'qty' => $value->qty,
                 'total' => $value->total,
                 'created_at' => now(),
-                'update_at' => now()
+                'updated_at' => now()
             ];
 
             PenjualanDetail::insert($produk);

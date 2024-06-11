@@ -1,10 +1,10 @@
-@extends('layouts.app')
+@extends('layouts.app-auth')
 
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
+            <div class="card" style="margin: 100px;">
                 <div class="card-header">{{ __('Reset Password') }}</div>
 
                 <div class="card-body">
@@ -36,6 +36,15 @@
                                 <button type="submit" class="btn btn-primary">
                                     {{ __('Send Password Reset Link') }}
                                 </button>
+                            </div>
+                        </div>
+                        <div class="row mb-0" style="margin-top: 10px;">
+                            <div class="col-md-12" align="center">
+                                <p style="color: #B4B4B8;">atau</p>
+                                <div class="row">
+                                    <div class="col-md-6 text-md-end"><a href="{{ url('register') }}"> Daftar</a></div>
+                                    <div class="col-md-6 text-md-start"><a href="{{ url('login') }}"> Login</a></div>
+                                </div>
                             </div>
                         </div>
                     </form>

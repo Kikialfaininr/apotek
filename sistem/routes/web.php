@@ -21,7 +21,18 @@ Auth::routes();
 
 /*------------------------------ Admin ------------------------------ */
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+// data pelanggan
 Route::get('/admin-datauser', [App\Http\Controllers\AdminUserController::class, 'index']);
+Route::get('/downloadpdf-pelanggan', [App\Http\Controllers\AdminUserController::class, 'downloadpdf']);
+
+// ongkir
+Route::get('/admin-ongkir', [App\Http\Controllers\AdminOngkirController::class, 'index']);
+Route::post('/simpan-data-ongkir', [App\Http\Controllers\AdminOngkirController::class, 'simpan']);
+Route::get('{id}/edit-ongkir', [App\Http\Controllers\AdminOngkirController::class, 'edit']);
+Route::post('/update-ongkir/{id}', [App\Http\Controllers\AdminOngkirController::class, 'update']);
+Route::get('{id}/hapus-ongkir', [App\Http\Controllers\AdminOngkirController::class, 'hapus']);
+Route::get('/downloadpdf-ongkir', [App\Http\Controllers\AdminOngkirController::class, 'downloadpdf']);
 
 // kategori
 Route::get('/admin-kategori', [App\Http\Controllers\AdminKategoriController::class, 'index']);
@@ -42,16 +53,14 @@ Route::get('/downloadpdf-produk', [App\Http\Controllers\AdminProdukController::c
 
 // kontrol stok
 Route::get('/admin-stok', [App\Http\Controllers\AdminStokController::class, 'index']);
-Route::get('/downloadstokhabis', [App\Http\Controllers\AdminStokController::class, 'downloadstokhabis']);
-Route::get('/downloadstokmenipis', [App\Http\Controllers\AdminStokController::class, 'downloadstokmenipis']);
 
 // penjualan
 Route::get('/admin-penjualan', [App\Http\Controllers\AdminPenjualanController::class, 'index']);
 Route::get('/downloadprodukterjual', [App\Http\Controllers\AdminPenjualanController::class, 'downloadprodukterjual']);
 Route::get('/downloadinvoice', [App\Http\Controllers\AdminPenjualanController::class, 'downloadinvoice']);
 
-// pesanan online masuk
-Route::get('/admin-pesananmasuk', [App\Http\Controllers\AdminPesananmasukController::class, 'index']);
+// pesanan online diproses
+Route::get('/admin-pesanandiproses', [App\Http\Controllers\AdminPesanandiprosesController::class, 'index']);
 
 // pesanan online selesai
 Route::get('/admin-pesananselesai', [App\Http\Controllers\AdminPesananselesaiController::class, 'index']);
@@ -65,12 +74,24 @@ Route::get('/admin-pesananbatal', [App\Http\Controllers\AdminPesananbatalControl
 // laporan penjualan
 Route::get('/admin-laporanpenjualan', [App\Http\Controllers\AdminLaporanpenjualanController::class, 'index']);
 Route::get('/download-laporanpenjualan', [App\Http\Controllers\AdminLaporanpenjualanController::class, 'downloadlaporanpenjualan']);
+Route::get('/download-laporanpenjualanbulanan', [App\Http\Controllers\AdminLaporanpenjualanController::class, 'laporanpenjualanbulanan']);
 
-// laporan penjualan
+// laporan keuangan
 Route::get('/admin-laporankeuangan', [App\Http\Controllers\AdminLaporankeuanganController::class, 'index']);
 Route::get('/download-laporankeuangan', [App\Http\Controllers\AdminLaporankeuanganController::class, 'downloadlaporankeuangan']);
+Route::get('/download-laporankeuanganbulanan', [App\Http\Controllers\AdminLaporankeuanganController::class, 'laporankeuanganbulanan']);
 
-/*------------------------------ Kasir ------------------------------ */
+// laporan stok opname
+Route::get('/admin-laporanstok', [App\Http\Controllers\AdminLaporanstokController::class, 'index']);
+Route::get('/download-laporanstok', [App\Http\Controllers\AdminLaporanstokController::class, 'downloadlaporanstok']);
+Route::get('/downloadstokhabis', [App\Http\Controllers\AdminLaporanstokController::class, 'downloadstokhabis']);
+Route::get('/downloadstokmenipis', [App\Http\Controllers\AdminLaporanstokController::class, 'downloadstokmenipis']);
+
+// Edit Profil
+Route::get('editprofil-admin', [\App\Http\Controllers\ProfilController::class, 'index']);
+Route::patch('updateprofil-admin/{id}', [\App\Http\Controllers\ProfilController::class, 'update'])->name('update');
+
+/*------------------------------ Apoteker ------------------------------ */
 // kasir
 Route::get('/kasir', [App\Http\Controllers\KasirController::class, 'index']);
 Route::post('/tambah-transaksi', [App\Http\Controllers\KasirController::class, 'submit']);
@@ -80,6 +101,7 @@ Route::get('{id}/hapus-kasir', [App\Http\Controllers\KasirController::class, 'ha
 // pesanan online
 Route::get('/kasir-pesananonline', [App\Http\Controllers\KasirPesananonlineController::class, 'index']);
 Route::post('/konfirmasi-pembayaran', [App\Http\Controllers\KasirPesananonlineController::class, 'konfirmasiPembayaran']);
+Route::post('/simpan-penerimaan', [App\Http\Controllers\KasirPesananonlineController::class, 'bukti']);
 Route::post('/update-status', [App\Http\Controllers\KasirPesananonlineController::class, 'updateStatus']);
 Route::get('/download-pesananonline', [App\Http\Controllers\KasirPesananonlineController::class, 'downloadpesanan']);
 Route::get('/download-detailonline', [App\Http\Controllers\KasirPesananonlineController::class, 'downloadpesanandetail']);
@@ -100,6 +122,10 @@ Route::get('/downloadinvoice-penjualan', [App\Http\Controllers\KasirRiwayatpenju
 Route::get('/kasir-riwayatpesananonline', [App\Http\Controllers\KasirRiwayatpesananController::class, 'index']);
 Route::get('/download-riwayatpesanan', [App\Http\Controllers\KasirRiwayatpesananController::class, 'downloadpesanan']);
 Route::get('/download-riwayatdetail', [App\Http\Controllers\KasirRiwayatpesananController::class, 'downloadpesanandetail']);
+
+// Edit Profil
+Route::get('editprofil-kasir', [\App\Http\Controllers\ProfilKasirController::class, 'index']);
+Route::patch('updateprofil-kasir/{id}', [\App\Http\Controllers\ProfilKasirController::class, 'update'])->name('update');
 
 /*------------------------------ Toko Online  ------------------------------ */
 // all produk
@@ -134,3 +160,9 @@ Route::post('/simpan-pesanan-vitamin', [App\Http\Controllers\TokoVitaminControll
 Route::get('/toko-checkout/{id}', [App\Http\Controllers\CheckoutController::class, 'checkout']);
 Route::post('/simpan-pengiriman', [App\Http\Controllers\CheckoutController::class, 'pengiriman']);
 Route::post('/simpan-bukti', [App\Http\Controllers\CheckoutController::class, 'bukti']);
+
+// pelanggan
+Route::get('/pelanggan', [App\Http\Controllers\PelangganController::class, 'index']);
+Route::get('{id}/edit-pelanggan', [App\Http\Controllers\PelangganController::class, 'edit']);
+Route::post('/update-pelanggan/{id}', [App\Http\Controllers\PelangganController::class, 'update']);
+

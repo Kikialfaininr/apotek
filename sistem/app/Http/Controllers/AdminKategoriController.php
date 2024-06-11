@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\DataTables;
 use App\Models\Kategori;
 use Redirect;
 use Session;
@@ -11,29 +12,33 @@ use PDF;
 
 class AdminKategoriController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        if ($request->has('search')) {
-            $kategori = Kategori::where('nama_kategori', 'LIKE', '%' . $request->search . '%')->paginate(10);
-        } else {
-            $kategori = Kategori::orderBy('created_at', 'DESC')->paginate(10);
-        }
-        return view('admin-kategori', compact('kategori', 'request'));
+        $kategori = Kategori::orderBy('updated_at', 'DESC')->get();
+        
+        return view('admin-kategori', compact('kategori'));
     }
 
+    
     public function simpan(Request $request)
     {
-        $this->validate($request, [
+        $validator = Validator::make($request->all(), [
             'nama_kategori' => 'unique:kategori',
         ], [
-            Session::flash('gagal', 'Gagal menyimpan data karena data sudah ada.'),
+            'nama_kategori.unique' => 'Gagal menyimpan data karena data sudah ada.',
         ]);
+
+        if ($validator->fails()) {
+            return redirect('/admin-kategori')->with([
+                'message' => $validator->errors()->first(),
+                'alert_class' => 'danger'
+            ]);
+        }
 
         $kategori = new kategori();
             $kategori->nama_kategori = $request->nama_kategori;
         $kategori->save();
-        Session::flash('sukses','Data berhasil ditambah');
-        return Redirect('/admin-kategori');      
+        return redirect('/admin-kategori')->with('message', 'Data berhasil ditambah')->with('alert_class', 'success');      
     }
 
     public function edit(Request $request, $id)
@@ -47,8 +52,7 @@ class AdminKategoriController extends Controller
         $kategori = kategori::where('id_kategori', $id)->first();
         $kategori->nama_kategori = $request->nama_kategori;
         $kategori->save();
-        Session::flash('sukses', 'Data berhasil diubah');
-        return Redirect('/admin-kategori');
+        return redirect('/admin-kategori')->with('message', 'Data berhasil diubah')->with('alert_class', 'success');
     }
 
     public function hapus(Request $request, $id)
@@ -57,14 +61,11 @@ class AdminKategoriController extends Controller
         $produkCount = $kategori->produk()->count();
 
         if ($produkCount > 0) {
-            Session::flash('gagal', 'Data tidak dapat dihapus karena masih terdapat produk yang terkait dengan kategori ini.');
-            return redirect('/admin-kategori');
+            return redirect('/admin-kategori')->with('error', 'Data tidak dapat dihapus karena masih terdapat produk yang terkait dengan kategori ini.');
         }
 
         $kategori->delete();
-        
-        Session::flash('sukses','Data berhasil dihapus');
-        return redirect('/admin-kategori');
+        return redirect('/admin-kategori')->with('message', 'Data berhasil dihapus')->with('alert_class', 'success');
     }
 
     public function downloadpdf()

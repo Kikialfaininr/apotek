@@ -86,13 +86,21 @@
         <div class="flex-container-1">
             <div class="left">
                 <ul>
-                    <li>No Order</li>
-                    <li>Tanggal</li>
-                    <li>Status</li>
+                        <li>Username</li>
+                        <li>No Order</li>
+                        <li>Tanggal</li>
+                        <li>Status</li>
                 </ul>
             </div>
             <div class="right">
                 <ul>
+                    <li>
+                        @if ($pesanan->pelanggan)
+                        {{$pesanan->pelanggan->name}}
+                        @else
+                        -
+                        @endif
+                    </li>
                     <li> {{ $pesanan->no_order }} </li>
                     <li> {{ date('Y-m-d : H:i:s', strtotime($pesanan->created_at)) }} </li>
                     <li>
@@ -161,14 +169,14 @@
             <div>
                 <ul>
                     <li>Alamat</li>
-                    <li>Jarak</li>
+                    <li>Wilayah</li>
                     <li>Ongkir</li>
                 </ul>
             </div>
             <div style="text-align: right;">
                 <ul>
                     <li>{{ $kirim->alamat }} </li>
-                    <li>{{ $kirim->jarak }} KM</li>
+                    <li>{{ $kirim->wilayah }} </li>
                     <li>Rp {{ number_format($kirim->ongkir) }} </li>
                 </ul>
             </div>

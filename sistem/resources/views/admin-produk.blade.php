@@ -2,11 +2,30 @@
 @extends('layouts.alert')
 
 @section('content')
+@if(auth()->check() && (auth()->user()->level == 'admin' || auth()->user()->level == 'owner'))
 <div class="card card-data col-md-12">
     <h1 style="color: #34495e; margin: 30px 0 30px 0; font-weight: bold; text-align: center;">Data Produk</h1>
     <div class="row">
         <div class="col-md-12 col-xs-12">
+            <div style="margin: 0 20px 0 20px;">
+                @if (session()->has('message'))
+                @php
+                $alertClass = session('alert_class', 'success');
+                @endphp
+
+                <div class="alert alert-{{ $alertClass }}">
+                    {{ session('message') }}
+                </div>
+                @endif
+
+                @if (session()->has('error'))
+                <div class="alert alert-danger">
+                    {{ session('error') }}
+                </div>
+                @endif
+            </div>
             <div class="row">
+                @if(auth()->check() && (auth()->user()->level == 'admin'))
                 <div class="col-md-8">
                     <button type="button" style="margin: 20px 0 20px 20px;" class="btn btn-primary"
                         data-bs-toggle="modal" data-bs-target="#TambahDataProduk" title="Tambah Data">
@@ -18,18 +37,20 @@
                         </button>
                     </a>
                 </div>
-                <div class="col-md-4">
-                    <form class="d-flex" style="margin: 20px 0 0 50px;" action="{{url('admin-produk')}}" method="GET">
-                        <input style="width: 200px" class="form-control me-2" type="text" name="search"
-                            placeholder="Masukkan nama produk" value="{{$request->search}}">
-                        <button class="btn btn-primary" type="submit">Search</button>
-                    </form>
+                @else
+                <div class="col-md-8">
+                    <a style="margin: 20px;" href="{{url('downloadpdf-produk')}}" target="_blank">
+                        <button class="btn btn-danger">
+                            <i class='fas fa-file-pdf'></i> Cetak
+                        </button>
+                    </a>
                 </div>
+                @endif
             </div>
         </div>
 
         <div class="table-responsive" style="width: 97%; margin-left: 15px;">
-            <table class="table table-responsive table-striped table-hover table-bordered">
+            <table id="example" class="table table-responsive table-striped table-hover table-bordered">
                 <thead>
                     <tr>
                         <th class="text-center">No</th>
@@ -41,7 +62,9 @@
                         <th class="text-center">Harga Beli</th>
                         <th class="text-center">Harga Jual</th>
                         <th class="text-center">Kategori</th>
+                        @if(auth()->check() && (auth()->user()->level == 'admin'))
                         <th class="text-center">Aksi</th>
+                        @endif
                     </tr>
                 </thead>
                 @if(isset($produk) && count($produk) > 0)
@@ -63,6 +86,7 @@
                         <td align="center">Rp {{ number_format($value->harga_beli) }}</td>
                         <td align="center">Rp {{ number_format($value->harga_jual) }}</td>
                         <td>{{$value->kategori->nama_kategori}}</td>
+                        @if(auth()->check() && (auth()->user()->level == 'admin'))
                         <td align="center">
                             <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
                                 data-bs-target="#UbahProduk{{$value->id_produk}}" title="Tambah Data">
@@ -73,36 +97,12 @@
                                         class="fas fa-trash"></i></button>
                             </a>
                         </td>
+                        @endif
                     </tr>
                     @endforeach
                 </tbody>
             </table>
-            <div class="d-flex justify-content-end">
-                <nav aria-label="Page navigation">
-                    <ul class="pagination">
-                        <li class="page-item {{ $produk->currentPage() == 1 ? 'disabled' : '' }}">
-                            <a class="page-link" href="{{ $produk->previousPageUrl() }}" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                        @for ($i = 1; $i <= $produk->lastPage(); $i++)
-                            <li class="page-item {{ $produk->currentPage() == $i ? 'active' : '' }}">
-                                <a class="page-link" href="{{ $produk->url($i) }}">{{ $i }}</a>
-                            </li>
-                            @endfor
-                            <li class="page-item {{ $produk->currentPage() == $produk->lastPage() ? 'disabled' : '' }}">
-                                <a class="page-link" href="{{ $produk->nextPageUrl() }}" aria-label="Next">
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
-                    </ul>
-                </nav>
-            </div>
         </div>
-        @else
-        <tr>
-            <td colspan="12" align="center">Data tidak ditemukan</td>
-        </tr>
         @endif
     </div>
 </div>
@@ -335,6 +335,18 @@
     </div>
 </div>
 @endforeach
+
+@push('scripts')
+<script>
+new DataTable('#example', {
+    responsive: true,
+    rowReorder: {
+        selector: 'td:nth-child(2)'
+    }
+});
+</script>
+@endpush
+
 <script type="text/javascript">
 var readFoto = function(event) {
     var input = event.target;
@@ -348,14 +360,8 @@ var readFoto = function(event) {
 };
 </script>
 
-<script>
-window.onload = function() {
-    if (!window.location.hash) {
-        window.location = window.location + '#loaded';
-        setTimeout(function() {
-            window.location.reload();
-        }, 5000);
-    }
-}
-</script>
+@else
+<?php abort(403, 'Unauthorized action.'); ?>
+@endif
+
 @endsection

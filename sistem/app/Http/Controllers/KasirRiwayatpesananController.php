@@ -23,12 +23,12 @@ class KasirRiwayatpesananController extends Controller
         $detail = PesananDetail::query();
 
         if ($tanggal) {
-            $pesanan = $pesanan->whereDate('created_at', $tanggal);
-            $detail = $detail->whereDate('created_at', $tanggal);
+            $pesanan = $pesanan->whereDate('updated_at', $tanggal);
+            $detail = $detail->whereDate('updated_at', $tanggal);
         }
 
-        $pesanan = $pesanan->orderBy('created_at', 'desc')->paginate(10);
-        $detail = $detail->orderBy('created_at', 'desc')->paginate(10);
+        $pesanan = $pesanan->orderBy('updated_at', 'desc')->get();
+        $detail = $detail->orderBy('updated_at', 'desc')->get();
 
         $pesananDetail = PesananDetail::whereIn('id_pesanan', $pesanan->pluck('id_pesanan'))->get();
         $pengiriman = Pengiriman::whereIn('id_pesanan', $pesanan->pluck('id_pesanan'))->get();
@@ -36,6 +36,7 @@ class KasirRiwayatpesananController extends Controller
 
         return view('/kasir-riwayatpesananonline', compact('pesanan', 'pesananDetail', 'pengiriman', 'buktiPembayaran', 'detail', 'tanggal'));
     }
+
 
     public function downloadpesanan()
     {

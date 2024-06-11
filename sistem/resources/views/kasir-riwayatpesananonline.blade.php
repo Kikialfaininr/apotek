@@ -2,6 +2,7 @@
 @extends('layouts.alert')
 
 @section('content')
+@if(auth()->check() && (auth()->user()->level == 'apoteker'))
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-12">
@@ -54,11 +55,12 @@
                                 </a>
                             </div>
                             <div class="table-responsive">
-                                <table class="table table-responsive table-striped table-hover table-bordered">
+                                <table id="example1" class="table table-responsive table-striped table-hover table-bordered small">
                                     <thead>
                                         <tr>
                                             <th class="text-center">No</th>
                                             <th class="text-center">Waktu</th>
+                                            <th class="text-center">Username</th>
                                             <th class="text-center">No Order</th>
                                             <th class="text-center">Total</th>
                                             <th class="text-center">Pengiriman</th>
@@ -73,7 +75,14 @@
                                         @if ($value->status == 'Selesai')
                                         <tr>
                                             <td align="center">{{ ++$no }}</td>
-                                            <td align="center">{{ $value->created_at }}</td>
+                                            <td align="center">{{ $value->updated_at }}</td>
+                                            <td align="center">
+                                                @if ($value->pelanggan)
+                                                    {{$value->pelanggan->name}}
+                                                @else
+                                                    -
+                                                @endif
+                                            </td>
                                             <td align="center">{{ $value->no_order }}</td>
                                             <td align="center">Rp. {{ number_format($value->grand_total) }}</td>
                                             <td align="center">{{ $value->metode_pengiriman }} </td>
@@ -84,12 +93,13 @@
                                                 <button type="button" class="btn btn-primary btn-sm"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#detail{{$value->id_pesanan}}"
-                                                    title="Detail Pesanan">
+                                                    title="Detail Pesanan"
+                                                    style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
                                                     Detail
                                                 </button>
                                                 <a href="{{url($value->id_pesanan.'/invoice-pesananonline')}}"
                                                     target="_blank">
-                                                    <button class="btn btn-danger btn-sm">
+                                                    <button class="btn btn-danger btn-sm" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
                                                         <i class="fas fa-file-invoice"></i>
                                                     </button>
                                                 </a>
@@ -97,11 +107,6 @@
                                         </tr>
                                         @endif
                                         @endforeach
-                                        @if ($no == 0)
-                                        <tr>
-                                            <td colspan="12" align="center">Data tidak ditemukan</td>
-                                        </tr>
-                                        @endif
                                     </tbody>
                                 </table>
                             </div>
@@ -121,7 +126,7 @@
                                 </a>
                             </div>
                             <div class="table-responsive">
-                                <table class="table table-responsive table-striped table-hover table-bordered">
+                                <table id="example2" class="table table-responsive table-striped table-hover table-bordered small" style="width: 100%;">
                                     <thead>
                                         <tr>
                                             <th class="text-center">No</th>
@@ -139,20 +144,15 @@
                                         @if ($value->pesanan->status == 'Selesai')
                                         <tr>
                                             <td align="center">{{ ++$no }}</td>
-                                            <td align="center">{{ $value->created_at }}</td>
+                                            <td align="center">{{ $value->updated_at }}</td>
                                             <td align="center">{{ $value->pesanan->no_order }}</td>
                                             <td align="center">{{ $value->produk->nama }}</td>
                                             <td align="center">Rp. {{ number_format($value->produk->harga_jual) }}</td>
                                             <td align="center">{{ $value->qty }} </td>
-                                            <td align="center">{{ $value->total }} </td>
+                                            <td align="center">Rp {{ number_format($value->total) }} </td>
                                         </tr>
                                         @endif
                                         @endforeach
-                                        @if ($no == 0)
-                                        <tr>
-                                            <td colspan="12" align="center">Data tidak ditemukan</td>
-                                        </tr>
-                                        @endif
                                     </tbody>
                                 </table>
                             </div>
@@ -223,8 +223,8 @@
                             <td>{{ $kirim->alamat }} </td>
                         </tr>
                         <tr>
-                            <td colspan="2">Jarak</td>
-                            <td>{{ $kirim->jarak }} KM</td>
+                            <td colspan="2">Wilayah</td>
+                            <td>{{ $kirim->wilayah }}</td>
                         </tr>
                         <tr>
                             <td colspan="2">Ongkir</td>
@@ -286,5 +286,28 @@
     </div>
 </div>
 @endforeach
+
+@push('scripts')
+<script>
+    new DataTable('#example1', {
+    responsive: true,
+    rowReorder: {
+        selector: 'td:nth-child(2)'
+    }
+});
+</script>
+<script>
+    new DataTable('#example2', {
+    responsive: true,
+    rowReorder: {
+        selector: 'td:nth-child(2)'
+    }
+});
+</script>
+@endpush
+
+@else
+<?php abort(403, 'Unauthorized action.'); ?>
+@endif
 
 @endsection

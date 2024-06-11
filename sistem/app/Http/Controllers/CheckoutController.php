@@ -27,54 +27,54 @@ class CheckoutController extends Controller
         // Mengambil data pengiriman berdasarkan id_pesanan
         $pengiriman = Pengiriman::where('id_pesanan', $id)->first();
 
-        return view ('toko-checkout', compact('checkout', 'pesanan', 'pengiriman', 'id'));
+        // Mengambil data wilayah untuk dropdown
+        $wilayah = Ongkir::all();
+
+
+        return view ('toko-checkout', compact('checkout', 'pesanan', 'pengiriman', 'wilayah', 'id'));
     }
 
     public function pengiriman(Request $request)
     {
         $id_pesanan = $request->input('id_pesanan');
-        $jarak = (int)$request->input('jarak');
+        $alamat = $request->input('alamat');
+        $id_ongkir = $request->input('id_ongkir');
         
-        if ($jarak > 15) {
-            return back()->with('error', 'Pengiriman ditolak, hanya menerima pengiriman dengan jarak dibawah 15 KM');
-        }
-    
-        // Lakukan perhitungan ongkir berdasarkan jarak
-        $ongkir = Ongkir::where('jarak_min', '<=', $jarak)
-                        ->where('jarak_maks', '>=', $jarak)
-                        ->first();
-    
+        // Ambil data ongkir berdasarkan id_ongkir yang dipilih
+        $ongkir = Ongkir::find($id_ongkir);
+
         if (!$ongkir) {
-            return back()->with('error', 'Ongkir tidak tersedia untuk jarak yang dimasukkan');
+            return back()->with('error', 'Wilayah ongkir tidak ditemukan');
         }
-    
+
         // Cek apakah sudah ada pengiriman untuk pesanan ini
         $existingPengiriman = Pengiriman::where('id_pesanan', $id_pesanan)->first();
         if ($existingPengiriman) {
             return back()->with('error', 'Anda sudah menginputkan pengiriman');
         }
-    
+
         // Simpan data pengiriman
         $pengiriman = new Pengiriman();
         $pengiriman->id_pesanan = $id_pesanan;
         $pengiriman->id_ongkir = $ongkir->id_ongkir;
-        $pengiriman->alamat = $request->alamat;
-        $pengiriman->jarak = $jarak;
+        $pengiriman->alamat = $alamat;
+        $pengiriman->wilayah = $ongkir->wilayah;  // Ambil wilayah dari data ongkir
         $pengiriman->ongkir = $ongkir->ongkir;
         $pengiriman->save();
-    
+
         // Tampilkan pesan sukses
         Session()->flash('message', 'Pengiriman berhasil disimpan');
         Session()->flash('alert_class', 'success');
-    
+
         $request->session()->forget('kasir');
-    
+
         // Menghitung total ongkir
         $totalOngkir = $ongkir->ongkir;
-    
+
         // Kembalikan total ongkir dan redirect ke checkout
         return redirect('/toko-checkout/' . $id_pesanan)->with('totalOngkir', $totalOngkir);
     }
+
 
     public function bukti(Request $request)
     {

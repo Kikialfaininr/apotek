@@ -5,20 +5,11 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\ResetsPasswords;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ResetPasswordController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Password Reset Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller is responsible for handling password reset requests
-    | and uses a simple trait to include this behavior. You're free to
-    | explore this trait and override any methods you wish to tweak.
-    |
-    */
-
     use ResetsPasswords;
 
     /**
@@ -26,5 +17,25 @@ class ResetPasswordController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = RouteServiceProvider::HOME;
+    protected function redirectTo()
+    {
+        // Get the authenticated user
+        $user = Auth::user();
+
+        // Check user level
+        switch ($user->level) {
+            case 'admin':
+            case 'owner':
+                return RouteServiceProvider::HOME;
+                break;
+            case 'apoteker':
+                return '/kasir';
+                break;
+            case 'pelanggan':
+                return '/';
+                break;
+            default:
+                return RouteServiceProvider::HOME;
+        }
+    }
 }

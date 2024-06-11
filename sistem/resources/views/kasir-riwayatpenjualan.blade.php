@@ -2,6 +2,7 @@
 @extends('layouts.alert')
 
 @section('content')
+@if(auth()->check() && (auth()->user()->level == 'apoteker'))
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-12">
@@ -54,7 +55,7 @@
                                 </a>
                             </div>
                             <div class="table-responsive">
-                                <table class="table table-responsive table-striped table-hover table-bordered">
+                                <table id="example1" class="table table-responsive table-striped table-hover table-bordered">
                                     <thead>
                                         <tr>
                                             <th class="text-center">No</th>
@@ -71,7 +72,7 @@
                                         @foreach($penjualanDetail as $no => $value)
                                         <tr>
                                             <td align="center">{{$no+1}}</td>
-                                            <td align="center">{{$value->created_at}}</td>
+                                            <td align="center">{{$value->updated_at}}</td>
                                             <td align="center">{{$value->penjualan->no_order}}</td>
                                             <td align="center">{{$value->produk->nama}}</td>
                                             <td align="center">Rp. {{ number_format($value->produk->harga_jual) }}</td>
@@ -79,40 +80,10 @@
                                             <td align="center">Rp. {{ number_format($value->total) }}</td>
                                         </tr>
                                         @endforeach
-                                        @else
-                                        <tr>
-                                            <td colspan="12" align="center">Data tidak ditemukan</td>
-                                        </tr>
                                         @endif
                                     </tbody>
                                 </table>
                             </div>
-                            @if(isset($penjualan) && count($penjualan) > 0)
-                            <div class="d-flex justify-content-end">
-                                <nav aria-label="Page navigation">
-                                    <ul class="pagination">
-                                        <li class="page-item {{ $penjualan->currentPage() == 1 ? 'disabled' : '' }}">
-                                            <a class="page-link" href="{{ $penjualan->previousPageUrl() }}"
-                                                aria-label="Previous">
-                                                <span aria-hidden="true">&laquo;</span>
-                                            </a>
-                                        </li>
-                                        @for ($i = 1; $i <= $penjualan->lastPage(); $i++)
-                                            <li class="page-item {{ $penjualan->currentPage() == $i ? 'active' : '' }}">
-                                                <a class="page-link" href="{{ $penjualan->url($i) }}">{{ $i }}</a>
-                                            </li>
-                                            @endfor
-                                            <li
-                                                class="page-item {{ $penjualan->currentPage() == $penjualan->lastPage() ? 'disabled' : '' }}">
-                                                <a class="page-link" href="{{ $penjualan->nextPageUrl() }}"
-                                                    aria-label="Next">
-                                                    <span aria-hidden="true">&raquo;</span>
-                                                </a>
-                                            </li>
-                                    </ul>
-                                </nav>
-                            </div>
-                            @endif
                         </div>
                         <div class="tab-pane fade" id="produkterjual" role="tabpanel"
                             aria-labelledby="produkterjual-tab" tabindex="0">
@@ -129,7 +100,7 @@
                                 </a>
                             </div>
                             <div class="table-responsive">
-                                <table class="table table-responsive table-striped table-hover table-bordered">
+                                <table id="example2" class="table table-responsive table-striped table-hover table-bordered" style="width: 100%;">
                                     <thead>
                                         <tr>
                                             <th class="text-center">No</th>
@@ -146,7 +117,7 @@
                                         @foreach($penjualanDetail as $no => $value)
                                         <tr>
                                             <td align="center">{{$no+1}}</td>
-                                            <td align="center">{{$value->created_at}}</td>
+                                            <td align="center">{{$value->updated_at}}</td>
                                             <td align="center">{{$value->penjualan->no_order}}</td>
                                             <td align="center">{{$value->produk->nama}}</td>
                                             <td align="center">Rp. {{ number_format($value->produk->harga_jual) }}</td>
@@ -154,42 +125,10 @@
                                             <td align="center">Rp. {{ number_format($value->total) }}</td>
                                         </tr>
                                         @endforeach
-                                        @else
-                                        <tr>
-                                            <td colspan="12" align="center">Data tidak ditemukan</td>
-                                        </tr>
                                         @endif
                                     </tbody>
                                 </table>
                             </div>
-                            @if(isset($penjualanDetail) && count($penjualanDetail) > 0)
-                            <div class="d-flex justify-content-end">
-                                <nav aria-label="Page navigation">
-                                    <ul class="pagination">
-                                        <li
-                                            class="page-item {{ $penjualanDetail->currentPage() == 1 ? 'disabled' : '' }}">
-                                            <a class="page-link" href="{{ $penjualanDetail->previousPageUrl() }}"
-                                                aria-label="Previous">
-                                                <span aria-hidden="true">&laquo;</span>
-                                            </a>
-                                        </li>
-                                        @for ($i = 1; $i <= $penjualanDetail->lastPage(); $i++)
-                                            <li
-                                                class="page-item {{ $penjualanDetail->currentPage() == $i ? 'active' : '' }}">
-                                                <a class="page-link" href="{{ $penjualanDetail->url($i) }}">{{ $i }}</a>
-                                            </li>
-                                            @endfor
-                                            <li
-                                                class="page-item {{ $penjualanDetail->currentPage() == $penjualanDetail->lastPage() ? 'disabled' : '' }}">
-                                                <a class="page-link" href="{{ $penjualanDetail->nextPageUrl() }}"
-                                                    aria-label="Next">
-                                                    <span aria-hidden="true">&raquo;</span>
-                                                </a>
-                                            </li>
-                                    </ul>
-                                </nav>
-                            </div>
-                            @endif
                         </div>
                     </div>
                 </div>
@@ -197,5 +136,28 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    new DataTable('#example1', {
+    responsive: true,
+    rowReorder: {
+        selector: 'td:nth-child(2)'
+    }
+});
+</script>
+<script>
+    new DataTable('#example2', {
+    responsive: true,
+    rowReorder: {
+        selector: 'td:nth-child(2)'
+    }
+});
+</script>
+@endpush
+
+@else
+<?php abort(403, 'Unauthorized action.'); ?>
+@endif
 
 @endsection

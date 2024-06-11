@@ -63,7 +63,7 @@ body {
 
 .menu li {
     padding: 15px;
-    border-bottom: 1px solid #34495e;
+    border-bottom: none;
 }
 
 .menu a {

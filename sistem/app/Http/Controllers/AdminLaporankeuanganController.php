@@ -24,13 +24,13 @@ class AdminLaporankeuanganController extends Controller
         $bulanTerpilih = $request->input('bulan');
         $penjualanDetail = PenjualanDetail::query();
         $pesananDetail = PesananDetail::query();
-
+ 
         if ($tanggal) {
-            $penjualanDetail = $penjualanDetail->whereDate('created_at', $tanggal);
-            $pesananDetail = $pesananDetail->whereDate('created_at', $tanggal);
+            $penjualanDetail = $penjualanDetail->whereDate('updated_at', $tanggal);
+            $pesananDetail = $pesananDetail->whereDate('updated_at', $tanggal);
         } elseif ($bulanTerpilih) {
-            $penjualanDetail = $penjualanDetail->whereMonth('created_at', $bulanTerpilih);
-            $pesananDetail = $pesananDetail->whereMonth('created_at', $bulanTerpilih);
+            $penjualanDetail = $penjualanDetail->whereMonth('updated_at', $bulanTerpilih);
+            $pesananDetail = $pesananDetail->whereMonth('updated_at', $bulanTerpilih);
         }
 
         $penjualanDetail = $penjualanDetail->get();
@@ -44,13 +44,7 @@ class AdminLaporankeuanganController extends Controller
         $mergedDetail = $penjualanDetail->merge($pesananDetail);
 
         // Menggunakan Collection untuk mengurutkan hasil berdasarkan waktu
-        $mergedDetail = $mergedDetail->sortBy('created_at');
-
-        // Jika ingin menggunakan paginasi, bisa menggunakan paginate() setelah merge
-        $perPage = 10;
-        $currentPage = \Illuminate\Pagination\Paginator::resolveCurrentPage();
-        $currentPageItems = $mergedDetail->slice(($currentPage - 1) * $perPage, $perPage)->all();
-        $mergedDetail = new LengthAwarePaginator($currentPageItems, count($mergedDetail), $perPage, $currentPage, ['path' => LengthAwarePaginator::resolveCurrentPath()]);
+        $mergedDetail = $mergedDetail->sortBy('updated_at');
 
         // Mendapatkan daftar bulan
         $bulanList = $this->getMonthList();
@@ -91,11 +85,38 @@ class AdminLaporankeuanganController extends Controller
         $mergedDetail = $penjualanDetail->merge($pesananDetail);
 
         // Menggunakan Collection untuk mengurutkan hasil berdasarkan waktu
-        $mergedDetail = $mergedDetail->sortBy('created_at');
+        $mergedDetail = $mergedDetail->sortBy('updated_at');
 
         $pdf = PDF::loadview('pdf-laporankeuangan', compact('mergedDetail'));
         $pdf->setPaper('F4', 'landscape');
         return $pdf->stream('data-laporankeuangan.pdf');
+    }
+
+    public function laporankeuanganbulanan(Request $request)
+    {
+        $bulan = $request->input('bulan');
+
+        $penjualanDetail = PenjualanDetail::query();
+        $pesananDetail = PesananDetail::query();
+
+        $penjualanDetail = $penjualanDetail->whereMonth('updated_at', $bulan)->get();
+        
+        $pesananDetail = $pesananDetail->whereHas('pesanan', function($query) use ($bulan){
+            $query->where('status', 'Selesai')->whereMonth('updated_at', $bulan);
+        })->get();
+
+        // Menggabungkan dua kumpulan data menggunakan merge
+        $mergedDetail = $penjualanDetail->merge($pesananDetail);
+
+        // Menggunakan Collection untuk mengurutkan hasil berdasarkan waktu
+        $mergedDetail = $mergedDetail->sortBy('updated_at');
+
+        $namaBulan = \Carbon\Carbon::createFromFormat('m', $bulan)->format('F');
+        $namaFile = 'data-laporankeuangan_' . $namaBulan . '.pdf';
+
+        $pdf = PDF::loadview('pdf-laporanbulanankeuangan', compact('mergedDetail', 'bulan'));
+        $pdf->setPaper('F4', 'landscape');
+        return $pdf->stream($namaFile);
     }
 }
 

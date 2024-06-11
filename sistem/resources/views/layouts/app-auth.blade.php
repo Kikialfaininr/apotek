@@ -22,8 +22,8 @@
                 document.title = 'Daftar Akun';
             }
         });
-    </script>
-    <link rel="icon" href="sistem\img\logo1.png" type="image">
+    </script> 
+    <link rel="icon" href="{{ asset('sistem/img/logo1.png') }}" type="image">
 
     <!-- My Own Styles -->
     <link rel="stylesheet" type="text/css" href="{{ asset('sistem\css\style.css') }}">

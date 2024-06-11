@@ -13,26 +13,12 @@ use Image;
 
 class AdminStokController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
         $kategori = Kategori::all();
-        $query = Produk::query();
-
-        if ($request->has('search')) {
-            $searchTerm = $request->search;
-            $query->where(function($q) use ($searchTerm) {
-                $q->where('nama', 'LIKE', '%' . $searchTerm . '%')
-                ->orWhere('bentuk_sediaan', 'LIKE', '%' . $searchTerm . '%')
-                ->orWhere('satuan', 'LIKE', '%' . $searchTerm . '%')
-                ->orWhereHas('kategori', function ($q) use ($searchTerm) {
-                        $q->where('nama_kategori', 'LIKE', '%' . $searchTerm . '%');
-                });
-            });
-        }
-
-        $produk = $query->with('kategori')->orderBy('created_at', 'DESC')->paginate(10);
+        $produk = Produk::with('kategori')->orderBy('updated_at', 'DESC')->get();
         
-        return view('admin-stok', compact('produk', 'kategori', 'request'));
+        return view('admin-stok', compact('produk', 'kategori'));
     }
 
     public function downloadstokhabis()

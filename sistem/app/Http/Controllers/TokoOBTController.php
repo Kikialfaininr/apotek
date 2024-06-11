@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Produk;
 use App\Models\Kategori;
 use App\Models\Kasir;
@@ -36,7 +37,7 @@ class TokoOBTController extends Controller
             });
         }
 
-        $produk = $query->orderBy('created_at', 'DESC')->paginate(10);
+        $produk = $query->orderBy('updated_at', 'DESC')->get();
         $kasir = Kasir::all();
         
         return view('toko-obt', compact('produk', 'kategori', 'kasir', 'request'));
@@ -145,6 +146,7 @@ class TokoOBTController extends Controller
         // Buat pesanan baru
         $pesanan = new Pesanan();
         $pesanan->no_order = 'ONLINE-' . date('Ymd') . rand(1111, 9999);
+        $pesanan->id = Auth::id();
         $pesanan->grand_total = $total_kasir; 
         $pesanan->metode_pengiriman = $request->input('metode_pengiriman');
         $pesanan->metode_pembayaran = $request->input('metode_pembayaran');
@@ -161,7 +163,7 @@ class TokoOBTController extends Controller
                 'qty' => $value->qty,
                 'total' => $value->total,
                 'created_at' => now(),
-                'update_at' => now()
+                'updated_at' => now()
             ];
 
             PesananDetail::insert($produk);

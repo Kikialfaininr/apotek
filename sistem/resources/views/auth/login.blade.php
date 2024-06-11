@@ -16,29 +16,24 @@
 
                     <form method="POST" action="{{ route('login') }}">
                         <h3 align="center">Masuk</h3>
+                        @if($errors->any())
+                        <div class="alert alert-danger" role="alert">
+                            {{ $errors->first() }}
+                        </div>
+                        @endif
                         @csrf
                         <div class="row mb-3">
                             <div class="col-md-12">
                                 <input id="email" type="email" class="form-control @error('email') is-invalid @enderror"
                                     name="email" value="{{ old('email') }}" required autocomplete="email" autofocus
                                     placeholder="Masukkan Email">
-                                @error('email')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                                @enderror
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-12">
                                 <input id="password" type="password"
                                     class="form-control @error('password') is-invalid @enderror" name="password"
-                                    required autocomplete="current-password" placeholder="Masukkan Email">
-                                @error('password')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                                @enderror
+                                    required autocomplete="current-password" placeholder="Masukkan Password">
                             </div>
                         </div>
                         <div class="row mb-3">
@@ -61,7 +56,7 @@
                                 @if (Route::has('password.request'))
                                 <div class="col-md-12 text-md-end">
                                     <a class="btn btn-link" href="{{ route('password.request') }}">
-                                        {{ __('Forgot Your Password?') }}
+                                        {{ __('Lupa Password?') }}
                                     </a>
                                 </div>
                                 @endif

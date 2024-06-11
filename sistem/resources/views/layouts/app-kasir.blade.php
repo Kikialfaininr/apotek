@@ -9,7 +9,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>Apotek Dua Farma</title>
-    <link rel="icon" href="sistem\img\logo1.png" type="image">
+    <link rel="icon" href="{{ asset('sistem/img/logo1.png') }}" type="image">
 
     <!-- My Own Styles -->
     <link rel="stylesheet" type="text/css" href="{{ asset('sistem\css\style-kasir.css') }}">
@@ -40,6 +40,11 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
+    <!-- DataTables -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link href="https://cdn.datatables.net/2.0.7/css/dataTables.dataTables.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/rowreorder/1.5.0/css/rowReorder.dataTables.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/responsive/3.0.2/css/responsive.dataTables.css" rel="stylesheet">
 
 </head>
 
@@ -48,31 +53,50 @@
         <nav class="navbar navbar-expand-md navbar-light shadow-sm">
             <div class="container">
                 <a class="navbar-brand" href="{{ url('/') }}">
-                    <img src="sistem/img/logo1.png" alt="apotek" width="100px"
+                    <img src="{{ asset('sistem/img/logo1.png') }}" alt="apotek" width="100px"
                         class="d-inline-block align-text-center" />
                 </a>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="{{ url('/kasir') }}">Kasir</a>
+                            <a class="nav-link{{ Request::is('kasir') ? ' active' : '' }}" aria-current="page"
+                                href="{{ url('/kasir') }}"
+                                style="{{ Request::is('kasir') ? 'color: #FFC045;' : '' }}">Kasir</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url('/kasir-pesananonline') }}">Pesanan Online</a>
+                            <a class="nav-link{{ Request::is('kasir-pesananonline') ? ' active' : '' }}"
+                                href="{{ url('/kasir-pesananonline') }}"
+                                style="{{ Request::is('kasir-pesananonline') ? 'color: #FFC045;' : '' }}">
+                                Pesanan Online
+                                @php
+                                $count = \App\Models\Pesanan::whereNull('status')->count();
+                                @endphp
+                                @if($count > 0)
+                                <span class="badge rounded-pill bg-danger">{{ $count }}</span>
+                                @endif
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url('/kasir-stokproduk') }}">Stok Produk</a>
+                            <a class="nav-link{{ Request::is('kasir-stokproduk') ? ' active' : '' }}"
+                                href="{{ url('/kasir-stokproduk') }}"
+                                style="{{ Request::is('kasir-stokproduk') ? 'color: #FFC045;' : '' }}">Stok Produk</a>
                         </li>
                         <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false" style="color: white;">
-                            Riwayat Transaksi
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="{{ url('/kasir-riwayatpenjualan') }}">Riwayat Penjualan</a></li>
-                            <li><a class="dropdown-item" href="{{ url('/kasir-riwayatpesananonline') }}">Riwayat Pesanan Online</a></li>
-                        </ul>
-                    </li>
+                            <a class="nav-link dropdown-toggle{{ Request::is('kasir-riwayatpenjualan') || Request::is('kasir-riwayatpesananonline') ? ' active' : '' }}"
+                                href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                                style="{{ Request::is('kasir-riwayatpenjualan') || Request::is('kasir-riwayatpesananonline') ? 'color: #FFC045;' : 'color: white;' }}">
+                                Riwayat Transaksi
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="{{ url('/kasir-riwayatpenjualan') }}">Riwayat
+                                        Penjualan</a></li>
+                                <li><a class="dropdown-item" href="{{ url('/kasir-riwayatpesananonline') }}">Riwayat
+                                        Pesanan Online</a></li>
+                            </ul>
+                        </li>
                     </ul>
+
                     <ul class="navbar-nav ms-auto">
                         @guest
                         @if (Route::has('login'))
@@ -90,10 +114,21 @@
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
                                 data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                @if(Auth::user()->foto)
+                                <img src="{{ asset('images/fotoprofil/'.Auth::user()->foto) }}" alt="profil"
+                                    style="width:40px; height: 40px;"
+                                    class="d-inline-block align-text-center rounded-circle">
+                                @else
+                                <img src="{{ asset('sistem/img/profil.jpg') }}" alt="profil"
+                                    style="width:40px; height: 40px;"
+                                    class="d-inline-block align-text-center rounded-circle">
+                                @endif
                                 {{ Auth::user()->name }}
                             </a>
-
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <a href="{{ url('editprofil-kasir') }}" class="dropdown-item">
+                                    Edit Profile
+                                </a>
                                 <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
                                     {{ __('Logout') }}
@@ -119,6 +154,12 @@
             <p>&#169;2024 Apotek Dua Farma</p>
         </footer>
     </div>
+    <script src="https://cdn.datatables.net/2.0.7/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/rowreorder/1.5.0/js/dataTables.rowReorder.js"></script>
+    <script src="https://cdn.datatables.net/rowreorder/1.5.0/js/rowReorder.dataTables.js"></script>
+    <script src="https://cdn.datatables.net/responsive/3.0.2/js/dataTables.responsive.js"></script>
+    <script src="https://cdn.datatables.net/responsive/3.0.2/js/responsive.dataTables.js"></script>
+    @stack('scripts')
 </body>
 
 </html>
