@@ -41,10 +41,12 @@ class AdminLaporankeuanganController extends Controller
         })->get();
 
         // Menggabungkan dua kumpulan data menggunakan merge
-        $mergedDetail = $penjualanDetail->merge($pesananDetail);
+        $mergedDetail = $penjualanDetail->concat($pesananDetail);
 
-        // Menggunakan Collection untuk mengurutkan hasil berdasarkan waktu
-        $mergedDetail = $mergedDetail->sortBy('updated_at');
+        // Mengurutkan hasil berdasarkan updated_at
+        $mergedDetail = $mergedDetail->sortBy(function($detail) {
+            return $detail->updated_at;
+        })->values(); // Memastikan koleksi diindeks ulang
 
         // Mendapatkan daftar bulan
         $bulanList = $this->getMonthList();
@@ -82,10 +84,12 @@ class AdminLaporankeuanganController extends Controller
         })->get();
 
         // Menggabungkan dua kumpulan data menggunakan merge
-        $mergedDetail = $penjualanDetail->merge($pesananDetail);
+        $mergedDetail = $penjualanDetail->concat($pesananDetail);
 
-        // Menggunakan Collection untuk mengurutkan hasil berdasarkan waktu
-        $mergedDetail = $mergedDetail->sortBy('updated_at');
+        // Mengurutkan hasil berdasarkan updated_at
+        $mergedDetail = $mergedDetail->sortBy(function($detail) {
+            return $detail->updated_at;
+        })->values(); // Memastikan koleksi diindeks ulang
 
         $pdf = PDF::loadview('pdf-laporankeuangan', compact('mergedDetail'));
         $pdf->setPaper('F4', 'landscape');
@@ -106,10 +110,12 @@ class AdminLaporankeuanganController extends Controller
         })->get();
 
         // Menggabungkan dua kumpulan data menggunakan merge
-        $mergedDetail = $penjualanDetail->merge($pesananDetail);
+        $mergedDetail = $penjualanDetail->concat($pesananDetail);
 
-        // Menggunakan Collection untuk mengurutkan hasil berdasarkan waktu
-        $mergedDetail = $mergedDetail->sortBy('updated_at');
+        // Mengurutkan hasil berdasarkan updated_at
+        $mergedDetail = $mergedDetail->sortBy(function($detail) {
+            return $detail->updated_at;
+        })->values(); // Memastikan koleksi diindeks ulang
 
         $namaBulan = \Carbon\Carbon::createFromFormat('m', $bulan)->format('F');
         $namaFile = 'data-laporankeuangan_' . $namaBulan . '.pdf';

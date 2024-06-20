@@ -24,36 +24,39 @@ class AdminLaporanpenjualanController extends Controller
     {
         $tanggal = $request->input('tanggal');
         $bulanTerpilih = $request->input('bulan');
-        $penjualanDetail = PenjualanDetail::query();
-        $pesananDetail = PesananDetail::query();
+        $penjualanDetailQuery = PenjualanDetail::query();
+        $pesananDetailQuery = PesananDetail::query();
 
+        // Filter berdasarkan tanggal atau bulan yang dipilih
         if ($tanggal) {
-            $penjualanDetail = $penjualanDetail->whereDate('updated_at', $tanggal);
-            $pesananDetail = $pesananDetail->whereDate('updated_at', $tanggal);
+            $penjualanDetailQuery->whereDate('updated_at', $tanggal);
+            $pesananDetailQuery->whereDate('updated_at', $tanggal);
         } elseif ($bulanTerpilih) {
-            $penjualanDetail = $penjualanDetail->whereMonth('updated_at', $bulanTerpilih);
-            $pesananDetail = $pesananDetail->whereMonth('updated_at', $bulanTerpilih);
+            $penjualanDetailQuery->whereMonth('updated_at', $bulanTerpilih);
+            $pesananDetailQuery->whereMonth('updated_at', $bulanTerpilih);
         }
 
-        $penjualanDetail = $penjualanDetail->get();
+        // Mengambil hasil query
+        $penjualanDetail = $penjualanDetailQuery->get();
 
         // Menambahkan kriteria status 'Selesai' pada pesananDetail
-        $pesananDetail = $pesananDetail->whereHas('pesanan', function($query) {
+        $pesananDetail = $pesananDetailQuery->whereHas('pesanan', function($query) {
             $query->where('status', 'Selesai');
         })->get();
 
-        // Menggabungkan dua kumpulan data menggunakan merge
-        $mergedDetail = $penjualanDetail->merge($pesananDetail);
+        // Menggabungkan dua kumpulan data menggunakan concat
+        $mergedDetail = $penjualanDetail->concat($pesananDetail);
 
-        // Menggunakan Collection untuk mengurutkan hasil berdasarkan waktu
-        $mergedDetail = $mergedDetail->sortBy('updated_at');
+        // Mengurutkan hasil berdasarkan updated_at
+        $mergedDetail = $mergedDetail->sortBy(function($detail) {
+            return $detail->updated_at;
+        })->values(); // Memastikan koleksi diindeks ulang
 
         // Mendapatkan daftar bulan
         $bulanList = $this->getMonthList();
 
         return view('admin-laporanpenjualan', compact('mergedDetail', 'tanggal', 'bulanList', 'bulanTerpilih'));
     }
-
 
     private function getMonthList()
     {
@@ -85,10 +88,12 @@ class AdminLaporanpenjualanController extends Controller
         })->get();
 
         // Menggabungkan dua kumpulan data menggunakan merge
-        $mergedDetail = $penjualanDetail->merge($pesananDetail);
+        $mergedDetail = $penjualanDetail->concat($pesananDetail);
 
-        // Menggunakan Collection untuk mengurutkan hasil berdasarkan waktu
-        $mergedDetail = $mergedDetail->sortBy('updated_at');
+        // Mengurutkan hasil berdasarkan updated_at
+        $mergedDetail = $mergedDetail->sortBy(function($detail) {
+            return $detail->updated_at;
+        })->values(); // Memastikan koleksi diindeks ulang
 
         $pdf = PDF::loadview('pdf-laporanpenjualan', compact('mergedDetail'));
         $pdf->setPaper('F4', 'landscape');
@@ -109,10 +114,12 @@ class AdminLaporanpenjualanController extends Controller
         })->get();
 
         // Menggabungkan dua kumpulan data menggunakan merge
-        $mergedDetail = $penjualanDetail->merge($pesananDetail);
+        $mergedDetail = $penjualanDetail->concat($pesananDetail);
 
-        // Menggunakan Collection untuk mengurutkan hasil berdasarkan waktu
-        $mergedDetail = $mergedDetail->sortBy('updated_at');
+        // Mengurutkan hasil berdasarkan updated_at
+        $mergedDetail = $mergedDetail->sortBy(function($detail) {
+            return $detail->updated_at;
+        })->values(); // Memastikan koleksi diindeks ulang
 
         $namaBulan = \Carbon\Carbon::createFromFormat('m', $bulan)->format('F');
         $namaFile = 'data-laporanpenjualan_' . $namaBulan . '.pdf';
