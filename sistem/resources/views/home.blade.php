@@ -57,12 +57,12 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Menyiapkan data untuk grafik
+    // Prepare data for the chart
     var datesCurrentMonth = @json($datesCurrentMonth);
     var revenuesCurrentMonthPenjualan = @json($revenuesCurrentMonthPenjualan);
     var revenuesCurrentMonthPesanan = @json($revenuesCurrentMonthPesanan);
 
-    // Membuat grafik menggunakan Chart.js
+    // Create the chart using Chart.js
     var ctx = document.getElementById('revenueChart').getContext('2d');
     var revenueChart = new Chart(ctx, {
         type: 'line',
