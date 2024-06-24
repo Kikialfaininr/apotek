@@ -15,7 +15,7 @@ class AdminOngkirController extends Controller
     {
         $ongkir = Ongkir::orderBy('ongkir')->get();
         
-        return view('admin-Ongkir', compact('ongkir'));
+        return view('admin-ongkir', compact('ongkir'));
     }
 
     public function simpan(Request $request)
