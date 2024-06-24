@@ -15,7 +15,7 @@ class Pesanan extends Model
 
     public function pesananDetail()
     {
-        return $this->hasMany(pesananDetail::class, 'id_pesanan');
+        return $this->hasMany(PesananDetail::class, 'id_pesanan');
     }
 
     public function pengiriman()

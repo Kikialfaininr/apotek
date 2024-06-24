@@ -15,6 +15,6 @@ class Penjualan extends Model
 
     public function penjualanDetail()
     {
-        return $this->hasMany(penjualanDetail::class, 'id_penjualan');
+        return $this->hasMany(PenjualanDetail::class, 'id_penjualan');
     }
 }
