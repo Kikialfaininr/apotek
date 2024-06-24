@@ -239,7 +239,7 @@
                         <label for="foto">{{ __('Foto Produk') }}</label>
                     
                         @if($value->foto)
-                            <img id="output" src="{{ asset('images/fotoproduk/' . $value->foto) }}" alt="Foto Produk" style="width: 100px;">
+                            <img id="output" src="images/fotoproduk/{{$value->foto}}" alt="Foto Produk" style="width: 100px;">
                         @else
                             <img id="output" style="width: 100px;">
                         @endif
