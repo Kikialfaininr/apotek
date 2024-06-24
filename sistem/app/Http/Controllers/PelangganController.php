@@ -78,7 +78,7 @@ class PelangganController extends Controller
                 $resize_foto = Image::make($file->getRealPath());
                 $resize_foto->resize(200, 200, function($constraint) {
                     $constraint->aspectRatio();
-                })->save(public_path('images/fotoprofil/'.$name));
+                })->save('images/fotoprofil/'.$name);
 
                 $pelanggan->foto = $name;
             }

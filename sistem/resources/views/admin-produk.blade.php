@@ -237,10 +237,17 @@
                     @csrf
                     <div>
                         <label for="foto">{{ __('Foto Produk') }}</label>
+                    
+                        @if($value->foto)
+                            <img id="output" src="{{ asset('images/fotoproduk/' . $value->foto) }}" alt="Foto Produk" style="width: 100px;">
+                        @else
+                            <img id="output" style="width: 100px;">
+                        @endif
+                    
                         <input id="foto" onchange="readFoto(event)" type="file"
                             class="form-control @error('foto') is-invalid @enderror" name="foto"
-                            value="{{ old('foto') }}" required autofocus>
-                        <img id="output" style="width: 100px;">
+                            value="{{ old('foto') }}" autofocus>
+                    
                         @error('foto')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $message }}</strong>

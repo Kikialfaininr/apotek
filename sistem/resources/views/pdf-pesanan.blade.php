@@ -47,18 +47,27 @@ td {
             <td align="center">{{ $value->updated_at }}</td>
             <td align="center">{{ $value->no_order }}</td>
             <td align="center">Rp. {{ number_format($value->grand_total) }}</td>
-            <td align="center">{{ $value->metode_pengiriman }} </td>
+            <td align="center">{{ $value->metode_pengiriman }}</td>
+            
+            @php $found = false; @endphp
             @foreach($pengiriman as $no => $kirim)
-            @if($kirim->id_pesanan == $value->id_pesanan)
-            <td align="center">{{ optional($kirim)->alamat ?? '-' }}</td>
-            <td align="center">{{ optional($kirim)->wilayah ?? '-' }}</td>
-            <td align="center">Rp {{ number_format(optional($kirim)->ongkir ?? '-') }}</td>
-            <td align="center">{{ $value->metode_pembayaran }}</td>
-            <td align="center">Rp {{ number_format($kirim->ongkir + $value->grand_total) }}</td>
-            @endif
+                @if($kirim->id_pesanan == $value->id_pesanan)
+                    @php $found = true; @endphp
+                    <td align="center">{{ optional($kirim)->alamat ?? '-' }}</td>
+                    <td align="center">{{ optional($kirim)->wilayah ?? '-' }}</td>
+                    <td align="center">Rp {{ number_format(optional($kirim)->ongkir ?? 0) }}</td>
+                @endif
             @endforeach
+            
+            @if (!$found)
+                <td align="center" colspan="3">-</td>
+            @endif
+        
+            <td align="center">{{ $value->metode_pembayaran }}</td>
+            <td align="center">Rp {{ number_format($value->grand_total + ($found ? optional($kirim)->ongkir : 0)) }}</td>
             <td align="center">{{ $value->status }}</td>
         </tr>
+        
         @endif
         @endforeach
         @if ($no == 0)

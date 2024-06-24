@@ -82,7 +82,7 @@ class AdminProdukController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'id_kategori' => 'required',
-            'foto' => 'mimes:jpg,jpeg,png',
+            'foto' => 'sometimes|mimes:jpg,jpeg,png',
             'stok' => 'required|numeric|min:0',
         ], [
             'id_kategori.required' => 'Isikan kategori obat!',
@@ -96,16 +96,7 @@ class AdminProdukController extends Controller
             ]);
         }
 
-        $file = $request->file('foto');
-        $name = 'FT'.date('Ymdhis').'.'.$request->file('foto')->getClientOriginalExtension();
-
-        $resize_foto = Image::make($file->getRealPath());
-        $resize_foto->resize(200, 200, function($constraint){
-            $constraint->aspectRatio();
-        })->save('images/fotoproduk/'.$name);
-
         $produk = produk::where('id_produk', $id)->first();
-            $produk->foto = $name;
             $produk->nama = $request->nama;
             $produk->bentuk_sediaan = $request->bentuk_sediaan;
             $produk->satuan = $request->satuan;
@@ -113,6 +104,20 @@ class AdminProdukController extends Controller
             $produk->harga_beli = $request->harga_beli;
             $produk->harga_jual = $request->harga_jual;
             $produk->id_kategori = $request->id_kategori;
+
+            if ($request->hasFile('foto')) {
+                $file = $request->file('foto');
+                if ($file) {
+                    $name = 'FT'.date('Ymdhis').'.'.$request->file('foto')->getClientOriginalExtension();
+    
+                    $resize_foto = Image::make($file->getRealPath());
+                    $resize_foto->resize(200, 200, function($constraint) {
+                        $constraint->aspectRatio();
+                    })->save('images/fotoproduk/'.$name);
+    
+                    $produk->foto = $name;
+                }
+            }
         $produk->save();
         return redirect('/admin-produk')->with('message', 'Data berhasil diubah')->with('alert_class', 'success');
     }

@@ -13,11 +13,6 @@
         <div class="col-md-12 col-xs-12">
             <div class="row" style="margin: 10px;">
                 <div class="col-md-8">
-                    <a href="#" target="_blank">
-                        <button class="btn btn-danger">
-                            <i class='fas fa-file-pdf'></i> Cetak
-                        </button>
-                    </a>
                 </div>
                 <div class="col-md-4">
                     <form action="{{ url('admin-pesananbatal') }}" method="GET" class="w-100">
