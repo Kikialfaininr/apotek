@@ -164,7 +164,7 @@
             </div>
         </div>
         @foreach($pengiriman as $no => $kirim)
-        @if($kirim->id_pesanan == $detai->id_pesanan)
+        @if($kirim->id_pesanan == $detail->id_pesanan)
         <div class="flex-container" style="text-align: right;">
             <div>
                 <ul>
